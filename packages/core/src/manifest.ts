@@ -16,6 +16,7 @@ export const manifestStepSchema = z.object({
   before: z.string().optional(),
   snapshot: z.string().optional(),
   target: box.optional(),
+  scroll: z.object({ x: z.number(), y: z.number() }).optional(),
   diff: z.number().optional(),
   changed: z.boolean().optional(),
 });

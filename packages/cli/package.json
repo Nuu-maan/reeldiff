@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown",
+    "build": "tsdown && node scripts/copy-viewer.ts",
     "dev": "tsdown --watch",
     "test": "vitest run",
     "typecheck": "tsc"
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@reeldiff/typescript-config": "workspace:*",
+    "@reeldiff/viewer": "workspace:*",
     "@types/node": "26.6.6",
     "tsdown": "0.23.7",
     "typescript": "6.0.3",

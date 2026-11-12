@@ -1,5 +1,6 @@
 import { relative } from "node:path";
 import { createRunDir, record, writeManifest } from "@reeldiff/core";
+import { copyViewer } from "../viewer.ts";
 import { prepare, printStep, reportFailure, type TargetFlags } from "./shared.ts";
 
 export async function recordCommand(flowId: string, flags: TargetFlags) {
@@ -27,10 +28,13 @@ export async function recordCommand(flowId: string, flags: TargetFlags) {
     flows: [recording],
   });
 
+  await copyViewer(dir);
+
   const out = relative(process.cwd(), dir).replaceAll("\\", "/") || ".";
   if (recording.video) console.log(`\nVideo     ${out}/${recording.video}`);
   console.log(`Steps     ${out}/flows/${flow.id}/steps/`);
   console.log(`Manifest  ${out}/manifest.json`);
+  console.log(`View      reeldiff view ${runId}`);
   if (recording.status === "broken") {
     const failed = recording.steps.find((step) => step.status === "failed");
     reportFailure(failed ?? { index: 0, error: recording.reason });

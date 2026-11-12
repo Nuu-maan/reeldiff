@@ -8,7 +8,7 @@ import { withStart } from "../replay/replay.ts";
 import { runSteps, type StepResult } from "../replay/steps.ts";
 import { toMp4 } from "./ffmpeg.ts";
 import { installOverlay } from "./overlay.ts";
-import { captureSnapshot, rrwebInitScript } from "./snapshot.ts";
+import { captureSnapshot, localizeAssets, rrwebInitScript } from "./snapshot.ts";
 
 export type RecordOptions = {
   baseUrl: string;
@@ -22,7 +22,12 @@ export type RecordOptions = {
   onStep?: (result: StepResult) => void;
 };
 
-type Capture = { screenshot: string; snapshot?: string; target?: ManifestStep["target"] };
+type Capture = {
+  screenshot: string;
+  snapshot?: string;
+  target?: ManifestStep["target"];
+  scroll?: ManifestStep["scroll"];
+};
 
 type OverlayPage = {
   __reeldiff: { show(): void; hide(): void; caption(text: string | null): void };
@@ -43,6 +48,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
 
   const browser = await chromium.launch({ headless: !options.headed });
   const captures = new Map<number, Capture>();
+  const assets = new Map<string, string>();
   let results: StepResult[] = [];
   let pageCreatedAt = 0;
 
@@ -65,15 +71,17 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
       if (options.before) return { screenshot };
       let snapshot: string | undefined = `${flowPath}/snapshots/${name}.json`;
       try {
+        const json = JSON.stringify(await captureSnapshot(page, mask));
         await writeFile(
           join(options.runDir, snapshot),
-          JSON.stringify(await captureSnapshot(page, mask)),
+          await localizeAssets(json, page, options.runDir, `${flowPath}/assets`, assets),
         );
       } catch {
         snapshot = undefined;
       }
       await overlay(page, "show");
-      return { screenshot, snapshot };
+      const scroll = await page.evaluate(() => ({ x: scrollX, y: scrollY }));
+      return { screenshot, snapshot, scroll };
     };
 
     results = await runSteps(page, withStart(flow), {
@@ -118,6 +126,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
         screenshot: shot?.screenshot,
         snapshot: shot?.snapshot,
         target: shot?.target,
+        scroll: shot?.scroll,
       };
     });
 
