@@ -6,6 +6,7 @@ import { exploreCommand } from "./commands/explore.ts";
 import { healCommand } from "./commands/heal.ts";
 import { recordCommand } from "./commands/record.ts";
 import { replayCommand } from "./commands/replay.ts";
+import { runCommand } from "./commands/run.ts";
 import { viewCommand } from "./commands/view.ts";
 
 const program = new Command()
@@ -57,6 +58,19 @@ program
   .option("--json", "print JSON")
   .option("-c, --config <path>", "path to reeldiff.config.ts")
   .action(affectedCommand);
+
+program
+  .command("run")
+  .description("The full pipeline: affected flows, record, compare, summarize, publish and notify.")
+  .option("--base <ref>", "base git ref", "origin/main")
+  .option("--head <ref>", "head git ref", "HEAD")
+  .option("--url <url>", "deployment to record, overrides baseUrl in the config")
+  .option("--compare-url <url>", "deployment to compare against, overrides compareUrl")
+  .option("--repo <owner/name>", "GitHub repo, defaults to GITHUB_REPOSITORY")
+  .option("--pr <number>", "PR number, defaults to the GitHub event")
+  .option("--title <title>", "PR title, defaults to the GitHub event")
+  .option("-c, --config <path>", "path to reeldiff.config.ts")
+  .action(runCommand);
 
 program
   .command("view")
