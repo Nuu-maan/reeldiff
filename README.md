@@ -22,17 +22,17 @@ and posts a short "what changed" note to the PR and Slack. Reviewers watch the c
   <img src="docs/media/launch-poster.png" width="860" alt="Reeldiff's replay page comparing a pricing card before and after a pull request">
 </a>
 
-<sub>▶ <a href="docs/media/launch.mp4">Watch the 22-second tour</a>. Every frame is real Reeldiff output from the example app in this repo.</sub>
+<sub><a href="docs/media/launch.mp4">Watch the 22-second tour</a>. Every frame is real Reeldiff output from the example app in this repo.</sub>
 
 </div>
 
 ## What you get on every PR
 
-- 🎬 **A video of each affected flow.** Reeldiff clicks through it in a real browser and records it, with step markers and captions.
-- ↔️ **Before and after.** Each step is captured on both versions and pixel-diffed. A slider shows exactly what moved.
-- 🖱️ **A clickable demo.** "Try it" rebuilds the page from DOM snapshots, so reviewers can click through without running anything.
-- 📝 **A plain-words summary.** One model call describes the visible change. Without a model key you still get a plain summary.
-- 🔕 **No noise.** Only flows touched by the diff run, and if nothing looks different, nobody gets pinged.
+- **A video of each affected flow.** Reeldiff clicks through it in a real browser and records it, with step markers and captions.
+- **Before and after.** Each step is captured on both versions and pixel-diffed. A slider shows exactly what moved.
+- **A clickable demo.** "Try it" rebuilds the page from DOM snapshots, so reviewers can click through without running anything.
+- **A plain-words summary.** One model call describes the visible change. Without a model key you still get a plain summary.
+- **No noise.** Only flows touched by the diff run, and if nothing looks different, nobody gets pinged.
 
 ## How it works
 
