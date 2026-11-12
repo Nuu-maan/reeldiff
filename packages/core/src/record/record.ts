@@ -8,7 +8,7 @@ import { withStart } from "../replay/replay.ts";
 import { runSteps, type StepResult } from "../replay/steps.ts";
 import { toMp4 } from "./ffmpeg.ts";
 import { installOverlay } from "./overlay.ts";
-import { captureSnapshot, rrwebInitScript } from "./snapshot.ts";
+import { captureSnapshot, localizeAssets, rrwebInitScript } from "./snapshot.ts";
 
 export type RecordOptions = {
   baseUrl: string;
@@ -48,6 +48,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
 
   const browser = await chromium.launch({ headless: !options.headed });
   const captures = new Map<number, Capture>();
+  const assets = new Map<string, string>();
   let results: StepResult[] = [];
   let pageCreatedAt = 0;
 
@@ -70,9 +71,10 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
       if (options.before) return { screenshot };
       let snapshot: string | undefined = `${flowPath}/snapshots/${name}.json`;
       try {
+        const json = JSON.stringify(await captureSnapshot(page, mask));
         await writeFile(
           join(options.runDir, snapshot),
-          JSON.stringify(await captureSnapshot(page, mask)),
+          await localizeAssets(json, page, options.runDir, `${flowPath}/assets`, assets),
         );
       } catch {
         snapshot = undefined;
