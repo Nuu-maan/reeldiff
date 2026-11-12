@@ -8,7 +8,7 @@ Reeldiff learns your web app's key flows, notices when a pull request changes th
 
 ## Develop
 
-Requires Node 22.18+ and pnpm.
+Requires Node 22.20+, pnpm and ffmpeg.
 
 ```sh
 pnpm install
