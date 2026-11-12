@@ -2,6 +2,9 @@ import * as z from "zod";
 
 const url = z.url({ protocol: /^https?$/ });
 
+// Workflows pass unset secrets as empty strings, so treat "" as not set.
+const optionalUrl = z.preprocess((value) => (value === "" ? undefined : value), url.optional());
+
 export const providers = [
   "openai",
   "anthropic",
@@ -16,7 +19,7 @@ const modelId = z.string().min(1);
 export const modelConfigSchema = z.strictObject({
   provider: z.enum(providers),
   model: modelId.meta({ description: "Default model id for every AI task" }),
-  baseUrl: url.optional().meta({ description: "Custom endpoint, required for openai-compatible" }),
+  baseUrl: optionalUrl.meta({ description: "Custom endpoint, required for openai-compatible" }),
   apiKeyEnv: z
     .string()
     .regex(/^[A-Z_][A-Z0-9_]*$/)
@@ -33,12 +36,12 @@ export const storageConfigSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("local"),
     dir: z.string().min(1).default(".reeldiff/published"),
-    publicUrl: url.optional().meta({ description: "Where dir is served, if anywhere" }),
+    publicUrl: optionalUrl.meta({ description: "Where dir is served, if anywhere" }),
   }),
   z.strictObject({
     type: z.literal("s3"),
     bucket: z.string().min(1),
-    endpoint: url.optional().meta({ description: "For R2, MinIO and other S3-compatible stores" }),
+    endpoint: optionalUrl.meta({ description: "For R2, MinIO and other S3-compatible stores" }),
     region: z.string().min(1).default("auto"),
     publicUrl: url.meta({
       description: "Public base URL of the bucket, used in Slack and PR links",
@@ -56,12 +59,8 @@ export const authProfileSchema = z.union([
 ]);
 
 export const configSchema = z.strictObject({
-  baseUrl: url
-    .optional()
-    .meta({ description: "Deployment to replay against, e.g. the PR preview" }),
-  compareUrl: url
-    .optional()
-    .meta({ description: "Deployment to compare against for before/after" }),
+  baseUrl: optionalUrl.meta({ description: "Deployment to replay against, e.g. the PR preview" }),
+  compareUrl: optionalUrl.meta({ description: "Deployment to compare against for before/after" }),
   model: modelConfigSchema.optional(),
   auth: z.record(z.string(), authProfileSchema).default({}),
   framework: z.enum(["nextjs-app", "nextjs-pages", "none"]).default("none"),
@@ -71,7 +70,7 @@ export const configSchema = z.strictObject({
     .strictObject({
       slack: z
         .strictObject({
-          webhookUrl: url.optional().meta({ description: "Incoming webhook URL, read from env" }),
+          webhookUrl: optionalUrl.meta({ description: "Incoming webhook URL, read from env" }),
         })
         .optional(),
       githubComment: z.boolean().default(true),

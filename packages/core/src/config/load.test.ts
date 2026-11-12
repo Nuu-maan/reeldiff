@@ -31,3 +31,13 @@ test("says how to fix a missing config", async () => {
   const cwd = await dirWith({});
   await expect(loadConfig({ cwd })).rejects.toThrow(/Create reeldiff.config.ts/);
 });
+
+test("treats empty env values for optional URLs as unset", async () => {
+  const cwd = await dirWith({
+    "reeldiff.config.mjs":
+      'export default { baseUrl: "http://localhost:3100", compareUrl: "", notify: { slack: { webhookUrl: "" } } };\n',
+  });
+  const { config } = await loadConfig({ cwd });
+  expect(config.compareUrl).toBeUndefined();
+  expect(config.notify.slack?.webhookUrl).toBeUndefined();
+});
