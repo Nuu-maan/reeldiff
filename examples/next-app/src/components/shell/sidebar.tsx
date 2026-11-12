@@ -25,7 +25,7 @@ export function Sidebar() {
         className="flex items-center gap-2 rounded-lg px-2 py-1 font-semibold text-neutral-900"
       >
         <Mark width={20} height={20} />
-        Plot
+        <span className="max-sm:sr-only">Plot</span>
       </Link>
       <nav aria-label="Main" className="flex gap-1 md:flex-col">
         {links.map(({ href, label, match, icon: Icon }) => {
