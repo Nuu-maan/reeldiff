@@ -66,8 +66,10 @@ const pointerActions = new Set(["click", "fill", "select", "hover"]);
 async function perform(context: StepContext, options: RunOptions) {
   const { page, step, target } = context;
   const timeout = options.stepTimeout;
-  if (options.humanize && target && pointerActions.has(step.action)) {
-    await glideTo(page, target, timeout);
+  // Scroll the same way in every mode, or before/after screenshots end up at different offsets.
+  if (target && pointerActions.has(step.action)) {
+    await target.scrollIntoViewIfNeeded({ timeout });
+    if (options.humanize) await glideTo(page, target, timeout);
   }
   switch (step.action) {
     case "goto":
@@ -84,6 +86,7 @@ async function perform(context: StepContext, options: RunOptions) {
       if (native) return void (await target.selectOption(step.value, { timeout }));
       await target.click({ timeout });
       const option = page.getByRole("option", { name: step.value, exact: true });
+      await option.scrollIntoViewIfNeeded({ timeout });
       if (options.humanize) {
         await page.waitForTimeout(250);
         await glideTo(page, option, timeout);
