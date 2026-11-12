@@ -33,8 +33,9 @@ export function describeStep(step: Step): string {
     case "goto":
       return `goto ${step.url}`;
     case "fill":
+      return `fill${target}`;
     case "select":
-      return `${step.action}${target} with "${step.value}"`;
+      return `select${target} with "${step.value}"`;
     case "press":
       return `press ${step.key}${target}`;
     case "wait":

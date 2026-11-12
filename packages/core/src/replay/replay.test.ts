@@ -47,13 +47,14 @@ test("replays fill, native and custom select, click and expect", async () => {
   );
   expect(result.steps.map((s) => [s.label, s.error ?? s.status])).toEqual([
     ["goto /", "passed"],
-    ['fill label "Name" with "Ada"', "passed"],
+    ['fill label "Name"', "passed"],
     ['select label "Size" with "Large"', "passed"],
     ['select button "Color" with "Teal"', "passed"],
     ['click button "Save"', "passed"],
     ['expect text "Ada Large Teal" visible', "passed"],
   ]);
   expect(result.status).toBe("passed");
+  expect(result.steps[1]?.label).not.toContain("Ada");
 });
 
 test("stops at the first failing step and reports it", async () => {
