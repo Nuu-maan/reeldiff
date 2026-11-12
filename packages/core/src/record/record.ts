@@ -18,6 +18,7 @@ export type RecordOptions = {
   stepDelay?: number;
   stepTimeout?: number;
   mask?: string[];
+  before?: boolean;
   onStep?: (result: StepResult) => void;
 };
 
@@ -37,7 +38,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
   const flowDir = join(options.runDir, flowPath);
   const videoTmp = join(tmpdir(), `reeldiff-video-${flow.id}-${Date.now()}`);
   await mkdir(join(flowDir, "steps"), { recursive: true });
-  await mkdir(join(flowDir, "snapshots"), { recursive: true });
+  if (!options.before) await mkdir(join(flowDir, "snapshots"), { recursive: true });
   const mask = maskSelector(options.mask);
 
   const browser = await chromium.launch({ headless: !options.headed });
@@ -50,17 +51,18 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
       baseURL: options.baseUrl,
       viewport: flow.viewport,
       storageState: options.storageState,
-      recordVideo: { dir: videoTmp, size: flow.viewport, fps: 30 },
+      ...(options.before ? {} : { recordVideo: { dir: videoTmp, size: flow.viewport, fps: 30 } }),
     });
     await context.addInitScript(installOverlay, mask);
-    await context.addInitScript({ content: await rrwebInitScript() });
+    if (!options.before) await context.addInitScript({ content: await rrwebInitScript() });
     const page = await context.newPage();
     pageCreatedAt = Date.now();
 
     const capture = async (name: string): Promise<Capture> => {
       await overlay(page, "hide");
-      const screenshot = `${flowPath}/steps/${name}.png`;
+      const screenshot = `${flowPath}/steps/${name}${options.before ? ".before" : ""}.png`;
       await page.screenshot({ path: join(options.runDir, screenshot), animations: "disabled" });
+      if (options.before) return { screenshot };
       let snapshot: string | undefined = `${flowPath}/snapshots/${name}.json`;
       try {
         await writeFile(
@@ -77,7 +79,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
     results = await runSteps(page, withStart(flow), {
       stepDelay: options.stepDelay ?? 400,
       stepTimeout: options.stepTimeout ?? 10_000,
-      humanize: true,
+      humanize: !options.before,
       onStep: options.onStep,
       beforeStep: async ({ step, index, target }) => {
         if (index === 0) return;
@@ -97,7 +99,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
 
     const firstStep = results[1] ?? results[0];
     const videoStart = firstStep ? firstStep.startedAt : pageCreatedAt;
-    const webm = video ? await video.path() : undefined;
+    const webm = video && !options.before ? await video.path() : undefined;
     if (webm) await toMp4(webm, join(flowDir, "video.mp4"), (videoStart - pageCreatedAt) / 1000);
 
     const steps: ManifestStep[] = results.slice(1).map((result) => {

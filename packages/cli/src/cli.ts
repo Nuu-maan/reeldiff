@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { ReeldiffError, version } from "@reeldiff/core";
 import { Command } from "commander";
+import { affectedCommand } from "./commands/affected.ts";
 import { exploreCommand } from "./commands/explore.ts";
 import { healCommand } from "./commands/heal.ts";
 import { recordCommand } from "./commands/record.ts";
@@ -46,6 +47,15 @@ program
   .option("--url <url>", "base URL, overrides baseUrl in the config")
   .option("-c, --config <path>", "path to reeldiff.config.ts")
   .action(healCommand);
+
+program
+  .command("affected")
+  .description("List the flows a git range affects, and why.")
+  .requiredOption("--base <ref>", "base git ref, e.g. origin/main")
+  .requiredOption("--head <ref>", "head git ref, e.g. HEAD")
+  .option("--json", "print JSON")
+  .option("-c, --config <path>", "path to reeldiff.config.ts")
+  .action(affectedCommand);
 
 try {
   await program.parseAsync();

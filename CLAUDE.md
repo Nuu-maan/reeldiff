@@ -4,7 +4,7 @@ Records demos of UI changes on every PR and posts them to Slack and the PR. Spec
 
 ## Stack
 
-- pnpm workspaces + Turborepo. Node >= 22.18 to build.
+- pnpm workspaces + Turborepo. Node >= 22.20.
 - TypeScript 6 everywhere (TS 7 has no compiler API yet, so dts tools can't use it). Shared configs in `packages/typescript-config`.
 - tsdown builds libraries (tsup is unmaintained). Vitest for unit tests, Playwright Test for e2e.
 - Biome lints and formats everything except Markdown.

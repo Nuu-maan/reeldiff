@@ -11,6 +11,16 @@ export {
 } from "./ai/explore.ts";
 export { type HealChange, type HealOptions, type HealResult, heal } from "./ai/heal.ts";
 export { defaultKeyEnv, languageModel, type Usage, UsageMeter } from "./ai/model.ts";
+export {
+  type Affected,
+  type AffectedFlow,
+  type AffectedRoute,
+  findAffected,
+} from "./change/affected.ts";
+export { compareFlow, shouldNotify } from "./change/compare.ts";
+export { diffRatio } from "./change/diff.ts";
+export { changedFiles } from "./change/git.ts";
+export type { RouteAdapter } from "./change/route-adapter.ts";
 export { loadNearestEnv } from "./config/env.ts";
 export { configFileNames, type LoadedConfig, loadConfig } from "./config/load.ts";
 export {

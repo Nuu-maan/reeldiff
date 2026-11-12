@@ -1,0 +1,39 @@
+{
+  "name": "@reeldiff/adapters",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Framework route mappers for Reeldiff",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@reeldiff/core": "workspace:*",
+    "@reeldiff/typescript-config": "workspace:*",
+    "@types/node": "26.6.6",
+    "tsdown": "0.23.7",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  },
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "inlinedDependencies": {
+    "@ai-sdk/provider": "4.0.37",
+    "@ai-sdk/provider-utils": "5.0.79",
+    "@standard-schema/spec": "1.1.0",
+    "ai": "7.0.170",
+    "zod": "4.6.7"
+  }
+}

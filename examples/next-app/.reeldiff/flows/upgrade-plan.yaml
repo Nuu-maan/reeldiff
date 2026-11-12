@@ -4,6 +4,7 @@ title: Upgrade to the Team plan
 description: Someone upgrades their plan and saves billing details.
 start: /settings/billing
 covers:
+  - "src/components/**"
   - "src/features/billing/**"
   - "src/app/(app)/settings/billing/**"
 steps:

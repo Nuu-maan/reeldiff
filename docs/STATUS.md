@@ -37,6 +37,14 @@ Deferred: login-flow auth profiles and the `reeldiff auth` command (#5).
 - `reeldiff explore "<goal>" --url <page>`: an AI SDK planner sees the accessibility tree and a screenshot, Stagehand grounds each plain-words step, our engine runs it, and the flow is saved only if a fresh deterministic replay passes.
 - Live checks with Claude Haiku 5.5 via OpenRouter: a renamed button healed for $0.0002, and a 6-step flow explored from one sentence for $0.0034.
 
-## Next: M5
+## M5: Affected flows, route adapters, pixel diff (done)
 
-`affected`, the Next.js route adapter and pixel diff.
+- `reeldiff affected --base <ref> --head <ref> [--json]` reads `git diff --relative base...head` from the project folder. It lists flows whose `covers` match (with the files that matched), maps other files under `uiPaths` to route snapshots through the framework adapter, and lists UI files nothing covers.
+- `packages/adapters`: `nextjs-app` (route groups, private folders, colocated files, parallel and intercepted routes, dynamic segments skipped) and `nextjs-pages`.
+- Pixel diff: `record` has a before mode (screenshots only, `steps/<i>.before.png`) for the compare URL. Each step is diffed with pixelmatch, and flows become `changed`, `unchanged`, `new` (no compare URL) or `broken`. `shouldNotify` skips posts when nothing changed and always reports broken flows.
+- `diffThreshold` now means the share of pixels that differ in the most-changed 64×64 area. A whole-screen fraction (the PRD's wording) treats a renamed button as 0.07% changed, under any useful threshold.
+- Glob matching uses Node's `path.matchesGlob`, so Node 22.20+ is required.
+
+## Next: M6
+
+Summarizer and the static replay viewer.
