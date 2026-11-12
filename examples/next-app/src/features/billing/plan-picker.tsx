@@ -39,7 +39,14 @@ export function PlanPicker() {
               )}
             >
               <div className="grid gap-1">
-                <h3 className="font-medium">{plan.name}</h3>
+                <h3 className="flex items-center gap-2 font-medium">
+                  {plan.name}
+                  {plan.id === "team" && (
+                    <span className="rounded-md bg-neutral-900 px-1.5 py-0.5 text-[11px] font-semibold text-white">
+                      Most popular
+                    </span>
+                  )}
+                </h3>
                 <p className="text-sm">{plan.summary}</p>
               </div>
               <p className="text-neutral-900">
