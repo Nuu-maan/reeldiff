@@ -1,8 +1,8 @@
 {
-  "name": "@reeldiff/cli",
+  "name": "reeldiff",
   "version": "0.0.0",
   "private": true,
-  "description": "The reeldiff command line",
+  "description": "Every PR gets a demo of what changed",
   "license": "MIT",
   "type": "module",
   "bin": {
