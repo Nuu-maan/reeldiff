@@ -22,7 +22,12 @@ export type RecordOptions = {
   onStep?: (result: StepResult) => void;
 };
 
-type Capture = { screenshot: string; snapshot?: string; target?: ManifestStep["target"] };
+type Capture = {
+  screenshot: string;
+  snapshot?: string;
+  target?: ManifestStep["target"];
+  scroll?: ManifestStep["scroll"];
+};
 
 type OverlayPage = {
   __reeldiff: { show(): void; hide(): void; caption(text: string | null): void };
@@ -73,7 +78,8 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
         snapshot = undefined;
       }
       await overlay(page, "show");
-      return { screenshot, snapshot };
+      const scroll = await page.evaluate(() => ({ x: scrollX, y: scrollY }));
+      return { screenshot, snapshot, scroll };
     };
 
     results = await runSteps(page, withStart(flow), {
@@ -118,6 +124,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
         screenshot: shot?.screenshot,
         snapshot: shot?.snapshot,
         target: shot?.target,
+        scroll: shot?.scroll,
       };
     });
 
