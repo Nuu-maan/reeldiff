@@ -6,6 +6,7 @@ import { exploreCommand } from "./commands/explore.ts";
 import { healCommand } from "./commands/heal.ts";
 import { recordCommand } from "./commands/record.ts";
 import { replayCommand } from "./commands/replay.ts";
+import { viewCommand } from "./commands/view.ts";
 
 const program = new Command()
   .name("reeldiff")
@@ -56,6 +57,14 @@ program
   .option("--json", "print JSON")
   .option("-c, --config <path>", "path to reeldiff.config.ts")
   .action(affectedCommand);
+
+program
+  .command("view")
+  .description("Serve a run's replay page locally. Defaults to the latest run.")
+  .argument("[runId]", "run folder name in .reeldiff/out")
+  .option("-p, --port <port>", "port to listen on", "4321")
+  .option("-c, --config <path>", "path to reeldiff.config.ts")
+  .action(viewCommand);
 
 try {
   await program.parseAsync();
