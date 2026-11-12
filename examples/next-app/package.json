@@ -25,6 +25,7 @@
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "reeldiff": "workspace:*",
     "tailwindcss": "4.3.5",
     "typescript": "6.0.3"
   }
