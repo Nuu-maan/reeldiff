@@ -1,0 +1,4 @@
+{
+  "extends": "@reeldiff/typescript-config/base.json",
+  "include": ["src"]
+}

@@ -14,6 +14,7 @@ export type PullRequest = {
   body?: string;
   url?: string;
   sha?: string;
+  baseSha?: string;
 };
 export type RunContext = { repo?: string; pr?: PullRequest; token?: string };
 
@@ -26,6 +27,7 @@ type Event = {
     body?: string | null;
     html_url: string;
     head: { sha: string };
+    base: { sha: string };
   };
   deployment?: { sha: string };
 };
@@ -58,6 +60,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
       body: p.body ?? undefined,
       url: p.html_url,
       sha: p.head.sha,
+      baseSha: p.base.sha,
     };
   } else if (event?.deployment && repo && token) {
     const octokit = new Octokit({ auth: token });
@@ -73,6 +76,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
         body: open.body ?? undefined,
         url: open.html_url,
         sha: event.deployment.sha,
+        baseSha: open.base.sha,
       };
     }
   }
@@ -183,4 +187,15 @@ export function githubCommentNotifier(options: {
 export async function writeJobSummary(markdown: string) {
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, `${markdown.replace(marker, "").trim()}\n`);
+}
+
+export async function setOutputs(outputs: Record<string, string>) {
+  const file = process.env.GITHUB_OUTPUT;
+  if (!file) return;
+  await appendFile(
+    file,
+    Object.entries(outputs)
+      .map(([key, value]) => `${key}=${value}\n`)
+      .join(""),
+  );
 }

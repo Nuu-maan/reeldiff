@@ -11,10 +11,13 @@ Records demos of UI changes on every PR and posts them to Slack and the PR. Spec
 
 ## Layout
 
-- `packages/core`: deterministic engine. No CLI, GitHub or Slack code here.
+- `packages/core`: the engine: flows, replay, record, diff, AI, storage, Slack. No CLI or GitHub-specific code here.
 - `packages/cli`: published as `reeldiff`. The bin, plus `defineConfig` re-exported for config files. Thin over core.
 - `examples/next-app`: "Plot", the demo app flows run against. Next.js 16 App Router, `src/` with `app/` for routes only, `features/<name>/` for feature code, `components/ui` for primitives, `lib/` for shared helpers.
-- Later milestones add `packages/viewer`, `packages/action`, `packages/adapters`.
+- `packages/adapters`: framework route mappers (`nextjs-app`, `nextjs-pages`).
+- `packages/viewer`: the static replay page (Vite + React). The CLI build copies it into `dist/viewer`.
+- `packages/action`: the GitHub Action. `dist/index.mjs` is committed; rebuild it with `pnpm build` and commit the result (CI checks it).
+- `.github/workflows`: CI, plus `reeldiff.yml`, which runs Reeldiff on PRs that touch the example app.
 
 ## Commands
 

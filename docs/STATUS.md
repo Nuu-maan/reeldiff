@@ -73,6 +73,25 @@ Deferred: login-flow auth profiles and the `reeldiff auth` command (#5).
 - Determinism fixes found by running identical UIs through `run`: targets now scroll into view the same way in every mode, and captures wait for running animations to finish.
 - Checked locally against a real UI change, with a base worktree and a fake Slack webhook: the right flow was picked, marked changed, summarized, published and posted.
 
-## Next: M8
+## M8: GitHub Action, CI and docs (done)
 
-The GitHub Action, docs and the README demo.
+- `packages/action`: a JavaScript action (`node24`) with a committed bundle. It masks known secrets, installs ffmpeg on Linux runners when it's missing, installs Chromium through `reeldiff install-browser --with-deps`, and runs `reeldiff run`. Outputs: `run-url`, `run-dir`, `notified`.
+- `reeldiff init` (detects Next.js App or Pages Router) and `reeldiff install-browser`.
+- `reeldiff run` takes base and head from the PR, has `--model-provider` and `--model`, and falls back to a plain summary when the model key is missing.
+- Workflows:
+  - `ci.yml`: lint, build, a check that the action bundle is current, typecheck, and tests in 3 engines.
+  - `reeldiff.yml`: runs the action on PRs that touch the example app, with base and head served on the runner.
+  - `examples/github/reeldiff.yml`: the `deployment_status` workflow for users.
+- Changesets is set up. All packages stay private until the npm name is settled.
+- Docs: the README with a GIF and screenshot recorded by Reeldiff, `docs/flows.md`, `docs/config.md` and `docs/github-action.md`.
+- Bugs only real CI could surface, now fixed:
+  - ubuntu runners have no ffmpeg;
+  - unset secrets arrive as empty strings, which failed URL validation;
+  - parallel browsers on a two-core runner got killed, so e2e uses one worker on CI.
+
+## Open
+
+- Slack and a public bucket aren't configured for this repo, so CI runs post the PR comment and job summary and skip Slack. Add `SLACK_WEBHOOK_URL`, plus S3 settings with a `publicUrl`, to get Slack posts with posters and a Watch demo link.
+- Without `OPENROUTER_API_KEY` as a repo secret, CI runs use the plain summary.
+- Login-flow auth profiles and `reeldiff auth` (#5). TypeScript 7 (#2). The PRD still names tsup (#3).
+- npm publishing, the `reeldiff` GitHub org and a `v1` action tag wait on PRD open question 4.

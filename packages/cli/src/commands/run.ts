@@ -15,6 +15,7 @@ import {
   loadFlows,
   type Manifest,
   type ManifestFlow,
+  modelConfigSchema,
   type Notifier,
   publishRun,
   ReeldiffError,
@@ -34,6 +35,7 @@ import {
   commentMarkdown,
   githubCommentNotifier,
   githubContext,
+  setOutputs,
   writeJobSummary,
 } from "../github.ts";
 import { copyViewer } from "../viewer.ts";
@@ -48,6 +50,8 @@ type RunFlags = {
   repo?: string;
   pr?: string;
   title?: string;
+  modelProvider?: string;
+  model?: string;
 };
 
 const routeFlow = (route: string): Flow => ({
@@ -73,11 +77,18 @@ export async function runCommand(flags: RunFlags) {
   const baseUrl = parseBaseUrl(flags.url ?? config.baseUrl);
   const compareRaw = flags.compareUrl ?? config.compareUrl;
   const compareUrl = compareRaw ? parseBaseUrl(compareRaw) : undefined;
-  const base = flags.base ?? "origin/main";
-  const head = flags.head ?? "HEAD";
   const context = await githubContext(flags);
+  const base = flags.base ?? context.pr?.baseSha ?? "origin/main";
+  const head = flags.head ?? context.pr?.sha ?? "HEAD";
   const meter = new UsageMeter();
-  const model = config.model;
+  const model =
+    flags.model || flags.modelProvider
+      ? modelConfigSchema.parse({
+          ...config.model,
+          provider: flags.modelProvider ?? config.model?.provider,
+          model: flags.model ?? config.model?.model,
+        })
+      : config.model;
 
   const files = await changedFiles(rootDir, base, head);
   const flows = await loadFlows(flowsDir(rootDir));
@@ -93,6 +104,7 @@ export async function runCommand(flags: RunFlags) {
   if (!affected.flows.length && !affected.routes.length) {
     console.log("No flows affected. Nothing to record.");
     await writeJobSummary("Reeldiff: no flows affected by this change.");
+    await setOutputs({ notified: "false" });
     return;
   }
 
@@ -117,13 +129,26 @@ export async function runCommand(flags: RunFlags) {
     return head;
   };
 
+  let modelSkipped = false;
+  const modelFor = (task: "heal" | "summarize") => {
+    if (!model || modelSkipped) return undefined;
+    try {
+      return languageModel(model, task);
+    } catch (error) {
+      modelSkipped = true;
+      console.log(`Model skipped: ${(error as Error).message}`);
+      return undefined;
+    }
+  };
+
   for (const { flow } of affected.flows) {
     let result = await capture(flow, "flow");
-    if (result.status === "broken" && model) {
+    const healModel = result.status === "broken" ? modelFor("heal") : undefined;
+    if (healModel) {
       console.log(`  ${flow.id}: trying to heal`);
       const healing = await heal(flow, {
         baseUrl: baseUrl.href,
-        model: languageModel(model, "heal"),
+        model: healModel,
         meter,
         stepDelay: config.stepDelay,
       }).catch((error: Error) => {
@@ -147,7 +172,8 @@ export async function runCommand(flags: RunFlags) {
   for (const { route } of affected.routes) recorded.push(await capture(routeFlow(route), "route"));
 
   const decision = shouldNotify({ flows: recorded });
-  const summary = model
+  const summaryModel = modelFor("summarize");
+  const summary = summaryModel
     ? await summarize(
         {
           flows: recorded,
@@ -155,7 +181,7 @@ export async function runCommand(flags: RunFlags) {
           diff: await diffText(rootDir, base, head, config.uiPaths),
           pr: context.pr,
         },
-        languageModel(model, "summarize"),
+        summaryModel,
         meter,
       ).catch((error: Error) => {
         console.log(`Summary failed, using a plain one: ${error.message}`);
@@ -200,6 +226,11 @@ export async function runCommand(flags: RunFlags) {
   const markdown = commentMarkdown(report, usage);
   await writeJobSummary(markdown);
   if (usage) console.log(`Model ${usage.replace("model: ", "")}`);
+  await setOutputs({
+    "run-dir": dir,
+    "run-url": published.url ?? "",
+    notified: String(decision.notify),
+  });
 
   if (!decision.notify) {
     console.log(`Not notifying: ${decision.reason}`);

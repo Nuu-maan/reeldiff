@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -80,4 +81,27 @@ test("affected lists flows and routes for a git range", async () => {
     routes: [{ route: "/settings/team", files: ["app/settings/team/page.tsx"] }],
     unmatched: [],
   });
+});
+
+test("the example workflow matches what reeldiff init writes", async () => {
+  const { workflowTemplate } = await import("./templates.ts");
+  const example = readFileSync(resolve("../../examples/github/reeldiff.yml"), "utf8");
+  expect(example).toBe(workflowTemplate);
+});
+
+test("init writes config, workflow and ignore entries without overwriting", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "reeldiff-init-"));
+  await writeFile(join(cwd, "package.json"), JSON.stringify({ dependencies: { next: "16" } }));
+  await mkdir(join(cwd, "app"));
+  await writeFile(join(cwd, ".gitignore"), "node_modules/");
+  expect(run(["init"], cwd).status).toBe(0);
+  expect(readFileSync(join(cwd, "reeldiff.config.ts"), "utf8")).toContain(
+    'framework: "nextjs-app"',
+  );
+  expect(readFileSync(join(cwd, ".gitignore"), "utf8")).toBe(
+    "node_modules/\n**/.reeldiff/out/\n**/.reeldiff/auth/\n**/.reeldiff/published/\n",
+  );
+  await writeFile(join(cwd, "reeldiff.config.ts"), "keep me");
+  expect(run(["init"], cwd).stdout).toContain("already exists");
+  expect(readFileSync(join(cwd, "reeldiff.config.ts"), "utf8")).toBe("keep me");
 });

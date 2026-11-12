@@ -37,6 +37,7 @@ export {
   defineConfig,
   type ModelConfig,
   type ModelTask,
+  modelConfigSchema,
   providers,
   type StorageConfig,
 } from "./config/schema.ts";

@@ -22,3 +22,4 @@ next-env.d.ts
 .claude/
 .playwright-mcp/
 **/.reeldiff/published/
+!packages/action/dist/

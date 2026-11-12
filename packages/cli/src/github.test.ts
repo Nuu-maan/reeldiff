@@ -89,6 +89,7 @@ describe("githubContext", () => {
           body: null,
           html_url: "https://github.com/acme/app/pull/12",
           head: { sha: "abc123" },
+          base: { sha: "def456" },
         },
       }),
     );
@@ -101,6 +102,7 @@ describe("githubContext", () => {
         title: "Taller cards",
         url: "https://github.com/acme/app/pull/12",
         sha: "abc123",
+        baseSha: "def456",
       },
     });
   });
