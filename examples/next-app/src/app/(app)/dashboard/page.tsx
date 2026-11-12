@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { NewProjectDialog } from "@/features/projects/new-project-dialog";
 import { ProjectCount, ProjectGrid } from "@/features/projects/project-grid";
 
-export const metadata: Metadata = { title: "Projects" };
+export const metadata: Metadata = { title: "Projects · Plot" };
 
 export default function DashboardPage() {
   return (

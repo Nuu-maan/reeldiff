@@ -2,7 +2,8 @@ import { expect, test } from "@playwright/test";
 
 test("adds and completes a task on a project", async ({ page }) => {
   await page.goto("/dashboard");
-  await page.getByRole("link", { name: /Mobile onboarding/ }).click();
+  await page.getByRole("link", { name: "Mobile onboarding", exact: true }).click();
+  await expect(page).toHaveTitle("Mobile onboarding · Plot");
   await expect(page.getByRole("heading", { name: "Mobile onboarding", level: 1 })).toBeVisible();
 
   await page.getByRole("tab", { name: "Tasks" }).click();
@@ -21,6 +22,7 @@ test("adds and completes a task on a project", async ({ page }) => {
 test("shows a way back for an unknown project", async ({ page }) => {
   await page.goto("/projects/does-not-exist");
   await expect(page.getByRole("heading", { name: "I can't find that project" })).toBeVisible();
+  await expect(page).toHaveTitle("Project not found · Plot");
   await page.getByRole("link", { name: "Back to projects" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 });

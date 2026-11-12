@@ -18,9 +18,10 @@ export function ProjectView({ id }: { id: string }) {
   const hydrated = useHydrated();
 
   if (!project) {
-    if (!hydrated) return null;
+    if (!hydrated) return <title>Plot</title>;
     return (
       <div className="grid justify-items-start gap-3">
+        <title>Project not found · Plot</title>
         <h1 className="text-2xl font-semibold">I can't find that project</h1>
         <p className="text-sm">It may have been created in another browser.</p>
         <Link href="/dashboard" className={buttonClass("secondary")}>
@@ -35,6 +36,7 @@ export function ProjectView({ id }: { id: string }) {
 
   return (
     <div className="grid gap-8">
+      <title>{`${project.name} · Plot`}</title>
       <header className="grid gap-2">
         <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm">
           <Link href="/dashboard" className="rounded-md hover:text-neutral-900">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BillingForm } from "@/features/billing/billing-form";
 import { PlanPicker } from "@/features/billing/plan-picker";
 
-export const metadata: Metadata = { title: "Billing" };
+export const metadata: Metadata = { title: "Billing · Plot" };
 
 export default function BillingPage() {
   return (

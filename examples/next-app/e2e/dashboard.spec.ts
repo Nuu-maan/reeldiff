@@ -37,3 +37,12 @@ test("skips motion when the user prefers reduced motion", async ({ page }) => {
   await expect(card).toBeVisible();
   expect(await card.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
 });
+
+test("titles a project created in the browser", async ({ page }) => {
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "New project" }).click();
+  await page.getByLabel("Project name").fill("Fresh idea");
+  await page.getByRole("button", { name: "Create" }).click();
+  await page.getByRole("link", { name: "Fresh idea", exact: true }).click();
+  await expect(page).toHaveTitle("Fresh idea · Plot");
+});

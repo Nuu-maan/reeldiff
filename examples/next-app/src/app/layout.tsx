@@ -6,7 +6,6 @@ import "./globals.css";
 const publicSans = Public_Sans({ variable: "--font-public-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "Plot", template: "%s · Plot" },
   description: "A small project tracker used to demo Reeldiff.",
 };
 
