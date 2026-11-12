@@ -31,6 +31,13 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "4.0.102",
+    "@ai-sdk/google": "4.0.118",
+    "@ai-sdk/openai": "4.0.115",
+    "@ai-sdk/openai-compatible": "3.0.90",
+    "@browserbasehq/stagehand": "4.4.0",
+    "@openrouter/ai-sdk-provider": "3.1.0",
+    "ai": "7.0.170",
     "playwright": "1.65.0",
     "rrweb-snapshot": "2.2.2",
     "yaml": "2.9.1",

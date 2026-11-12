@@ -48,13 +48,19 @@ export async function loadFlows(dir: string): Promise<Flow[]> {
   );
 }
 
-export async function loadFlow(dir: string, id: string): Promise<Flow> {
-  const name = (await flowFiles(dir)).find((file) => basename(file, extname(file)) === id);
+export async function findFlowFile(dir: string, id: string): Promise<string> {
+  const files = await flowFiles(dir);
+  const name = files.find((file) => basename(file, extname(file)) === id);
   if (!name) {
-    const known = (await flowFiles(dir)).map((file) => basename(file, extname(file)));
+    const known = files.map((file) => basename(file, extname(file)));
     throw new ReeldiffError(
       `No flow "${id}" in ${dir}.${known.length ? ` Known flows: ${known.join(", ")}` : ""}`,
     );
   }
-  return parseFlow(await readFile(join(dir, name), "utf8"), name);
+  return join(dir, name);
+}
+
+export async function loadFlow(dir: string, id: string): Promise<Flow> {
+  const path = await findFlowFile(dir, id);
+  return parseFlow(await readFile(path, "utf8"), basename(path));
 }

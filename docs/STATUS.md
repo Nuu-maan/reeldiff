@@ -29,6 +29,14 @@ Deferred: login-flow auth profiles and the `reeldiff auth` command (#5).
 - Masking: `input[type=password]` plus config `mask` selectors are blurred in video and screenshots, and their values and text are masked in snapshots.
 - `manifest.json` is a Zod schema in core (`src/manifest.ts`), shared by the viewer, notifiers and the Action.
 
-## Next: M4
+## M4: Explore and heal (done)
 
-`explore` and `heal` with Stagehand and the AI SDK.
+- Model layer (BYOK): `model: { provider, model, baseUrl?, apiKeyEnv?, explore?, heal?, summarize? }` for openai, anthropic, google, openrouter, ollama and openai-compatible, all through the AI SDK. Keys only come from env (provider default name or `apiKeyEnv`); the nearest `.env` is loaded without overriding the shell. Token usage is metered per task, plus cost when the provider reports it (OpenRouter).
+- Stagehand 4 runs on Playwright's Chromium. Its model calls go through our AI SDK model (`src/ai/stagehand.ts`), and Playwright attaches to the same browser over CDP.
+- `reeldiff heal <flowId>` replays in the AI browser. On a failing step it asks Stagehand to find the element for the step's intent, converts it to a verified user-facing target, retries, and rewrites only that target in the YAML (comments kept).
+- `reeldiff explore "<goal>" --url <page>`: an AI SDK planner sees the accessibility tree and a screenshot, Stagehand grounds each plain-words step, our engine runs it, and the flow is saved only if a fresh deterministic replay passes.
+- Live checks with Claude Haiku 5.5 via OpenRouter: a renamed button healed for $0.0002, and a 6-step flow explored from one sentence for $0.0034.
+
+## Next: M5
+
+`affected`, the Next.js route adapter and pixel diff.
