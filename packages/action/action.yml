@@ -1,0 +1,44 @@
+name: Reeldiff
+description: Record demos of the UI changes in a pull request and post them to Slack and the PR.
+author: Reeldiff contributors
+branding:
+  icon: film
+  color: gray-dark
+inputs:
+  head-url:
+    description: URL of the deployment to record, usually the PR preview.
+    required: true
+  base-url:
+    description: URL to compare against for before and after, such as production.
+    required: false
+  config:
+    description: Path to reeldiff.config.ts, relative to working-directory.
+    required: false
+  model-provider:
+    description: Overrides model.provider from the config.
+    required: false
+  model:
+    description: Overrides model.model from the config.
+    required: false
+  base-ref:
+    description: Base git ref. Defaults to the PR base commit.
+    required: false
+  head-ref:
+    description: Head git ref. Defaults to the PR head commit.
+    required: false
+  working-directory:
+    description: Folder to run in. Defaults to the repository root.
+    required: false
+  cli:
+    description: Command that runs the reeldiff CLI. Defaults to node_modules/.bin/reeldiff, then reeldiff on PATH.
+    required: false
+outputs:
+  run-url:
+    description: Public URL of the replay page, when storage has a public URL.
+  run-dir:
+    description: Local folder with the run's files.
+  notified:
+    description: Whether a notification was sent ("true" or "false").
+runs:
+  using: node24
+  main: dist/index.mjs

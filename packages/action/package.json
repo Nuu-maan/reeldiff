@@ -1,0 +1,23 @@
+{
+  "name": "@reeldiff/action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub Action that runs Reeldiff on pull requests",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@actions/core": "3.0.1"
+  },
+  "devDependencies": {
+    "@reeldiff/typescript-config": "workspace:*",
+    "@types/node": "26.6.6",
+    "tsdown": "0.23.7",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
