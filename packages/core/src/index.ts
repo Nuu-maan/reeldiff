@@ -16,10 +16,5 @@ export {
   targetSchema,
 } from "./flow/schema.ts";
 export { describeTarget, locate } from "./replay/locate.ts";
-export {
-  describeStep,
-  type ReplayOptions,
-  type ReplayResult,
-  replay,
-  type StepResult,
-} from "./replay/replay.ts";
+export { type ReplayOptions, type ReplayResult, replay } from "./replay/replay.ts";
+export { describeStep, type StepResult } from "./replay/steps.ts";
