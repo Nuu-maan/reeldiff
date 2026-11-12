@@ -21,7 +21,7 @@ The replay page is a static folder (HTML, video, screenshots, snapshots) that wo
 
 ## Quickstart
 
-Requires Node 22.20+ and ffmpeg (`winget install ffmpeg`, `brew install ffmpeg` or `apt-get install ffmpeg`).
+Requires Node 22.20+ and ffmpeg (`winget install ffmpeg`, `brew install ffmpeg` or `apt-get install ffmpeg`). The GitHub Action installs ffmpeg on Linux runners when it is missing.
 
 ```sh
 npm install --save-dev reeldiff
