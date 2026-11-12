@@ -23,7 +23,29 @@ const exec = (args: string[]) =>
     child.on("close", (code) => done(code ?? 1));
   });
 
+const hasFfmpeg = () =>
+  new Promise<boolean>((done) => {
+    const child = spawn("ffmpeg", ["-version"], { stdio: "ignore" });
+    child.on("error", () => done(false));
+    child.on("close", (code) => done(code === 0));
+  });
+
+const shell = (command: string) =>
+  new Promise<number>((done, fail) => {
+    info(`$ ${command}`);
+    const child = spawn("bash", ["-c", command], { stdio: "inherit" });
+    child.on("error", fail);
+    child.on("close", (code) => done(code ?? 1));
+  });
+
 try {
+  if (!(await hasFfmpeg())) {
+    if (process.platform !== "linux") throw new Error("ffmpeg isn't installed on this runner.");
+    const installed = await shell(
+      "sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends ffmpeg",
+    );
+    if (installed !== 0) throw new Error("Installing ffmpeg failed.");
+  }
   if ((await exec(["install-browser", "--with-deps"])) !== 0)
     throw new Error("Installing Chromium failed.");
   const code = await exec(
