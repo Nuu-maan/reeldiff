@@ -4,6 +4,8 @@ import { Command } from "commander";
 import { affectedCommand } from "./commands/affected.ts";
 import { exploreCommand } from "./commands/explore.ts";
 import { healCommand } from "./commands/heal.ts";
+import { initCommand } from "./commands/init.ts";
+import { installBrowserCommand } from "./commands/install-browser.ts";
 import { recordCommand } from "./commands/record.ts";
 import { replayCommand } from "./commands/replay.ts";
 import { runCommand } from "./commands/run.ts";
@@ -13,6 +15,19 @@ const program = new Command()
   .name("reeldiff")
   .description("Every PR gets a demo of what changed.")
   .version(version, "-v, --version");
+
+program
+  .command("init")
+  .description(
+    "Create reeldiff.config.ts, .reeldiff/flows, a GitHub workflow and .gitignore entries.",
+  )
+  .action(initCommand);
+
+program
+  .command("install-browser")
+  .description("Install the Chromium build Reeldiff records with.")
+  .option("--with-deps", "also install system packages (CI)")
+  .action(installBrowserCommand);
 
 program
   .command("replay")
@@ -62,13 +77,15 @@ program
 program
   .command("run")
   .description("The full pipeline: affected flows, record, compare, summarize, publish and notify.")
-  .option("--base <ref>", "base git ref", "origin/main")
-  .option("--head <ref>", "head git ref", "HEAD")
+  .option("--base <ref>", "base git ref, defaults to the PR base or origin/main")
+  .option("--head <ref>", "head git ref, defaults to the PR head or HEAD")
   .option("--url <url>", "deployment to record, overrides baseUrl in the config")
   .option("--compare-url <url>", "deployment to compare against, overrides compareUrl")
   .option("--repo <owner/name>", "GitHub repo, defaults to GITHUB_REPOSITORY")
   .option("--pr <number>", "PR number, defaults to the GitHub event")
   .option("--title <title>", "PR title, defaults to the GitHub event")
+  .option("--model-provider <provider>", "override model.provider from the config")
+  .option("--model <id>", "override model.model from the config")
   .option("-c, --config <path>", "path to reeldiff.config.ts")
   .action(runCommand);
 
