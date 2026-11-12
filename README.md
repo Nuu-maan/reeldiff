@@ -18,7 +18,7 @@ and posts a short "what changed" note to the PR and Slack. Reviewers watch the c
 
 [Quickstart](#quickstart) · [How it works](#how-it-works) · [Writing flows](docs/flows.md) · [GitHub Action](docs/github-action.md) · [Config](docs/config.md)
 
-<img src="docs/media/launch.webp" width="860" alt="A 22-second tour: a pull request adds a badge to a pricing card, and Reeldiff's replay page plays the recorded flow and compares before and after">
+<img src="docs/media/launch.avif" width="860" alt="A 22-second tour: a pull request adds a badge to a pricing card, and Reeldiff's replay page plays the recorded flow and compares before and after">
 
 <sub>A 22-second tour. Every frame is real Reeldiff output from the example app in this repo.</sub>
 
