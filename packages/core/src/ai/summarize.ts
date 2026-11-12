@@ -13,7 +13,12 @@ export const summarySchema = z.object({
     .max(4)
     .describe("1 to 4 short bullets a PM or designer would care about"),
   perFlow: z
-    .array(z.object({ flowId: z.string(), note: z.string() }))
+    .array(
+      z.object({
+        flowId: z.string(),
+        note: z.string().describe("At most two short sentences about what looks different"),
+      }),
+    )
     .describe("One short note per affected flow id"),
 });
 
@@ -124,7 +129,10 @@ export async function summarize(
     perFlow: Object.fromEntries(
       result.output.perFlow
         .filter((entry) => known.has(entry.flowId))
-        .map((entry) => [entry.flowId, entry.note]),
+        .map((entry) => [
+          entry.flowId,
+          entry.note.length > 280 ? `${entry.note.slice(0, 279)}…` : entry.note,
+        ]),
     ),
   };
 }
