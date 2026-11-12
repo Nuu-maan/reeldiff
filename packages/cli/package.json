@@ -18,7 +18,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@reeldiff/core": "workspace:*"
+    "@reeldiff/core": "workspace:*",
+    "commander": "15.1.0"
   },
   "devDependencies": {
     "@reeldiff/typescript-config": "workspace:*",
@@ -29,5 +30,9 @@
   },
   "engines": {
     "node": ">=22.18.0"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
   }
 }

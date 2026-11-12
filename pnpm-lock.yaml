@@ -224,6 +224,9 @@ importers:
       '@reeldiff/core':
         specifier: workspace:*
         version: link:../core
+      commander:
+        specifier: 15.1.0
+        version: 15.1.0
     devDependencies:
       '@reeldiff/typescript-config':
         specifier: workspace:*
@@ -1075,6 +1078,10 @@ packages:
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+
+  commander@15.1.0:
+    resolution: {integrity: sha512-cgnQ88TRrWcC7pVq46RzJVRMktu3W2RcbnoidnfBsl1bmDCBwJS/udcIZpKoCrbAYYaCqsz1yZCVIgbIaU3ddQ==}
+    engines: {node: '>=22.12.0'}
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -2130,6 +2137,8 @@ snapshots:
   chai@6.3.0: {}
 
   client-only@0.0.1: {}
+
+  commander@15.1.0: {}
 
   csstype@3.2.3: {}
 
