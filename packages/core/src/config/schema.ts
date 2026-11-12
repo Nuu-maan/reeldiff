@@ -48,7 +48,10 @@ export const configSchema = z.strictObject({
   uiPaths: z.array(z.string().min(1)).default([]),
   storage: z.looseObject({ type: z.enum(["s3", "local"]) }).optional(),
   notify: z.looseObject({}).optional(),
-  diffThreshold: z.number().min(0).max(1).default(0.01),
+  diffThreshold: z.number().min(0).max(1).default(0.01).meta({
+    description:
+      "Fraction of pixels that must differ in the most-changed 64×64 area for a step to count as changed",
+  }),
   mask: z.array(z.string().min(1)).default([]),
   stepDelay: z
     .number()
