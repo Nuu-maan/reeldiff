@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { ReeldiffError, version } from "@reeldiff/core";
 import { Command } from "commander";
+import { recordCommand } from "./commands/record.ts";
 import { replayCommand } from "./commands/replay.ts";
 
 const program = new Command()
@@ -16,6 +17,15 @@ program
   .option("--url <url>", "base URL to replay against, overrides baseUrl in the config")
   .option("-c, --config <path>", "path to reeldiff.config.ts")
   .action(replayCommand);
+
+program
+  .command("record")
+  .description("Replay a flow and record an MP4, per-step screenshots and DOM snapshots.")
+  .argument("<flowId>", "flow id, the file name in .reeldiff/flows without .yaml")
+  .option("--headed", "show the browser")
+  .option("--url <url>", "base URL to record against, overrides baseUrl in the config")
+  .option("-c, --config <path>", "path to reeldiff.config.ts")
+  .action(recordCommand);
 
 try {
   await program.parseAsync();

@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "@playwright/test";
@@ -23,6 +23,15 @@ test.describe("reeldiff replay", () => {
       expect(result.status).toBe(0);
     });
   }
+
+  test("records create-project into a run folder with a manifest", async ({ baseURL }) => {
+    const result = reeldiff(["record", "create-project", "--url", baseURL ?? ""]);
+    expect(result.status).toBe(0);
+    const manifestPath = result.stdout.match(/Manifest\s+(\S+)/)?.[1] ?? "";
+    const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+    expect(manifest.flows[0]).toMatchObject({ id: "create-project", status: "new" });
+    expect(manifest.flows[0].steps).toHaveLength(6);
+  });
 
   test("fails on a broken flow and names the step and its intent", async ({ baseURL }) => {
     const cwd = await mkdtemp(join(tmpdir(), "reeldiff-broken-"));

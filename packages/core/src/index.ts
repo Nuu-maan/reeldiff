@@ -15,11 +15,16 @@ export {
   type Target,
   targetSchema,
 } from "./flow/schema.ts";
-export { describeTarget, locate } from "./replay/locate.ts";
 export {
-  describeStep,
-  type ReplayOptions,
-  type ReplayResult,
-  replay,
-  type StepResult,
-} from "./replay/replay.ts";
+  type FlowStatus,
+  type Manifest,
+  type ManifestFlow,
+  type ManifestStep,
+  manifestSchema,
+} from "./manifest.ts";
+export { toMp4 } from "./record/ffmpeg.ts";
+export { maskSelector, type RecordOptions, record } from "./record/record.ts";
+export { createRunDir, newRunId, writeManifest } from "./record/run-dir.ts";
+export { describeTarget, locate } from "./replay/locate.ts";
+export { type ReplayOptions, type ReplayResult, replay } from "./replay/replay.ts";
+export { describeStep, type StepResult } from "./replay/steps.ts";

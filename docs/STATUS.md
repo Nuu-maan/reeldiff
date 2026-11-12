@@ -21,6 +21,14 @@ Deferred: Changesets (M8), CI workflow (M8), a login page for auth profiles (M2/
 
 Deferred: login-flow auth profiles and the `reeldiff auth` command (#5).
 
-## Next: M3
+## M3: Record (done)
 
-`reeldiff record`: MP4, screenshots, DOM snapshots and a cursor overlay.
+- `reeldiff record <flowId>` writes `.reeldiff/out/<runId>/` with `manifest.json` and `flows/<id>/video.mp4`, `poster.png`, `steps/<i>.png`, `snapshots/<i>.json`.
+- Video: Playwright at the flow viewport and 30fps, converted by system ffmpeg to H.264 (`-preset veryfast`), lead-in trimmed. App motion stays on; the cursor glides to each target with a press ripple, text is typed visibly, captions show as an overlay.
+- Captures are taken before each step and after the last: screenshots with animations frozen, rrweb snapshots, and the target's box for the viewer hotspot. Overlays are removed before every capture.
+- Masking: `input[type=password]` plus config `mask` selectors are blurred in video and screenshots, and their values and text are masked in snapshots.
+- `manifest.json` is a Zod schema in core (`src/manifest.ts`), shared by the viewer, notifiers and the Action.
+
+## Next: M4
+
+`explore` and `heal` with Stagehand and the AI SDK.
