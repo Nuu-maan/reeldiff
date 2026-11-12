@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start --port 3100",
     "typecheck": "next typegen && tsc",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:browsers": "playwright test -c playwright.xb.config.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
