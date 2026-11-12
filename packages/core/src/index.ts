@@ -38,6 +38,7 @@ export {
   type ModelConfig,
   type ModelTask,
   providers,
+  type StorageConfig,
 } from "./config/schema.ts";
 export { ReeldiffError } from "./errors.ts";
 export { setStepTargets } from "./flow/edit.ts";
@@ -60,9 +61,27 @@ export {
   type ManifestStep,
   manifestSchema,
 } from "./manifest.ts";
+export {
+  counts,
+  formatSeconds,
+  type Notifier,
+  type RunReport,
+  shownFlows,
+} from "./notify/notifier.ts";
+export { slackMessage, slackNotifier } from "./notify/slack.ts";
 export { toMp4 } from "./record/ffmpeg.ts";
 export { maskSelector, type RecordOptions, record } from "./record/record.ts";
 export { createRunDir, newRunId, writeManifest } from "./record/run-dir.ts";
 export { describeTarget, locate } from "./replay/locate.ts";
 export { type ReplayOptions, type ReplayResult, replay } from "./replay/replay.ts";
 export { describeStep, type StepResult } from "./replay/steps.ts";
+export { storageFor } from "./storage/from-config.ts";
+export { localStorage } from "./storage/local.ts";
+export { s3Storage } from "./storage/s3.ts";
+export {
+  contentTypeFor,
+  type Published,
+  publishRun,
+  runPrefix,
+  type StorageProvider,
+} from "./storage/storage.ts";
