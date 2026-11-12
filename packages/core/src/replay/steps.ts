@@ -108,6 +108,40 @@ async function perform(context: StepContext, options: RunOptions) {
 const firstLine = (error: unknown) =>
   (error instanceof Error ? error.message : String(error)).split("\n")[0] ?? "";
 
+export async function runStep(
+  page: Page,
+  step: Step,
+  index: number,
+  options: RunOptions,
+): Promise<StepResult> {
+  const startedAt = Date.now();
+  const context: StepContext = {
+    page,
+    step,
+    index,
+    target: "target" in step && step.target ? locate(page, step.target) : undefined,
+  };
+  const result: StepResult = {
+    index,
+    step,
+    label: describeStep(step),
+    status: "passed",
+    startedAt,
+    durationMs: 0,
+  };
+  try {
+    await options.beforeStep?.(context);
+    await perform(context, options);
+    await page.waitForLoadState("networkidle", { timeout: options.stepTimeout });
+    if (options.stepDelay) await page.waitForTimeout(options.stepDelay);
+  } catch (error) {
+    result.status = "failed";
+    result.error = firstLine(error);
+  }
+  result.durationMs = Date.now() - startedAt;
+  return result;
+}
+
 export async function runSteps(
   page: Page,
   steps: Step[],
@@ -115,31 +149,7 @@ export async function runSteps(
 ): Promise<StepResult[]> {
   const results: StepResult[] = [];
   for (const [index, step] of steps.entries()) {
-    const startedAt = Date.now();
-    const context: StepContext = {
-      page,
-      step,
-      index,
-      target: "target" in step && step.target ? locate(page, step.target) : undefined,
-    };
-    const result: StepResult = {
-      index,
-      step,
-      label: describeStep(step),
-      status: "passed",
-      startedAt,
-      durationMs: 0,
-    };
-    try {
-      await options.beforeStep?.(context);
-      await perform(context, options);
-      await page.waitForLoadState("networkidle", { timeout: options.stepTimeout });
-      if (options.stepDelay) await page.waitForTimeout(options.stepDelay);
-    } catch (error) {
-      result.status = "failed";
-      result.error = firstLine(error);
-    }
-    result.durationMs = Date.now() - startedAt;
+    const result = await runStep(page, step, index, options);
     results.push(result);
     options.onStep?.(result);
     if (result.status === "failed") break;
