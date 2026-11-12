@@ -12,7 +12,7 @@ Requires Node 22.18+ and pnpm.
 
 ```sh
 pnpm install
-pnpm exec playwright install chromium
+pnpm --filter @reeldiff/example-next-app exec playwright install chromium
 pnpm build
 pnpm test
 pnpm --filter @reeldiff/example-next-app dev   # http://localhost:3100
