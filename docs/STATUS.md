@@ -45,6 +45,19 @@ Deferred: login-flow auth profiles and the `reeldiff auth` command (#5).
 - `diffThreshold` now means the share of pixels that differ in the most-changed 64×64 area. A whole-screen fraction (the PRD's wording) treats a renamed button as 0.07% changed, under any useful threshold.
 - Glob matching uses Node's `path.matchesGlob`, so Node 22.20+ is required.
 
-## Next: M6
+## M6: Summarizer and replay viewer (done)
 
-Summarizer and the static replay viewer.
+- `summarize()` makes one structured call per run. Inputs: the PR title and body, the affected flows and changed steps, the diff (UI files first, cut at about 80k characters), and up to 6 before/after pairs, picked round-robin across flows. It returns `headline`, `bullets` and `perFlow`. `fallbackSummary()` covers runs with no model.
+- `packages/viewer`: a static Vite + React + Tailwind page that reads `manifest.json`.
+  - Shows the PR header and summary, with one tab per flow and a status badge.
+  - Video mode: native controls, a seekable step-marker timeline, and a caption track built from the steps.
+  - Try it mode: rrweb snapshots rebuilt in a sandboxed iframe, with a hotspot on each step's target that advances; it falls back to the screenshot.
+  - Before/after mode: a slider for changed steps.
+  - Light and dark themes, a phone layout, Public Sans bundled. It never fetches anything outside the run folder.
+- Snapshots no longer depend on the app being reachable: fonts and images their CSS points at are saved into `flows/<id>/assets/`.
+- `record` copies the viewer into every run folder. `reeldiff view [runId]` serves a run with HTTP range support, for video seeking.
+- Checked in Chromium, Firefox and WebKit, and at phone width.
+
+## Next: M7
+
+Storage (S3 or local), Slack, the PR comment and `reeldiff run`.
