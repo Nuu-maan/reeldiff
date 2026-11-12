@@ -6,13 +6,15 @@
   "license": "MIT",
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "schema"
   ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
     "test": "vitest run",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "schema": "node scripts/write-schema.ts"
   },
   "devDependencies": {
     "@reeldiff/typescript-config": "workspace:*",
