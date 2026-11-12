@@ -5,7 +5,8 @@
 - pnpm + Turborepo workspace, shared tsconfig, Biome.
 - `@reeldiff/core` and `@reeldiff/cli` build with tsdown and have Vitest tests. The CLI only prints its version for now.
 - `examples/next-app` ("Plot") with three screens: `/dashboard` (projects + new project dialog), `/projects/[id]` (overview and tasks tabs), `/settings/billing` (plans + billing form with a masked card field).
-- Playwright smoke tests cover all three screens.
+- Playwright smoke tests cover all three screens. `pnpm --filter @reeldiff/example-next-app test:browsers` runs them in Chromium, Firefox, WebKit, iPhone and Pixel profiles.
+- Reviewed in real browsers: no console errors, keyboard-only flows work, no overflow at 320px, motion is skipped under reduced motion so replays are stable.
 
 Deferred: Changesets (M8), CI workflow (M8), a login page for auth profiles (M2/M3).
 
