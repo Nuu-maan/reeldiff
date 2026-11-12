@@ -23,3 +23,5 @@ next-env.d.ts
 .playwright-mcp/
 **/.reeldiff/published/
 !packages/action/dist/
+
+AGENTS.md
