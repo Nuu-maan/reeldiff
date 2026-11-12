@@ -41,7 +41,7 @@
   },
   "overrides": [
     {
-      "includes": ["**/globals.css"],
+      "includes": ["**/globals.css", "**/viewer/src/styles.css"],
       "linter": {
         "rules": {
           "complexity": {
