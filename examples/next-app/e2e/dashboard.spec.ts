@@ -25,3 +25,15 @@ test("create stays disabled until the project has a name", async ({ page }) => {
   await page.getByRole("button", { name: "New project" }).click();
   await expect(page.getByRole("button", { name: "Create" })).toBeDisabled();
 });
+
+test("skips motion when the user prefers reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "New project" }).click();
+  await page.getByLabel("Project name").fill("Still project");
+  await page.getByRole("button", { name: "Create" }).click();
+
+  const card = page.getByRole("listitem").filter({ hasText: "Still project" });
+  await expect(card).toBeVisible();
+  expect(await card.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+});

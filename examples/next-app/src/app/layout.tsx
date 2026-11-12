@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Public_Sans } from "next/font/google";
-import { Providers } from "@/components/shell/providers";
+import { MotionPreferences } from "@/components/shell/motion-preferences";
 import "./globals.css";
 
 const publicSans = Public_Sans({ variable: "--font-public-sans", subsets: ["latin"] });
@@ -20,7 +20,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Providers>{children}</Providers>
+        <MotionPreferences />
+        {children}
       </body>
     </html>
   );
