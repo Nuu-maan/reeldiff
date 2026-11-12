@@ -58,6 +58,21 @@ Deferred: login-flow auth profiles and the `reeldiff auth` command (#5).
 - `record` copies the viewer into every run folder. `reeldiff view [runId]` serves a run with HTTP range support, for video seeking.
 - Checked in Chromium, Firefox and WebKit, and at phone width.
 
-## Next: M7
+## M7: Storage, notifications and `reeldiff run` (done)
 
-Storage (S3 or local), Slack, the PR comment and `reeldiff run`.
+- `reeldiff run [--base] [--head] [--url] [--compare-url] [--repo] [--pr] [--title]` runs the full PRD 8.2 pipeline:
+  - finds affected flows and routes, and exits quietly when there are none;
+  - records each one, and heals a broken flow once when a model is configured (the fix is only suggested, never committed);
+  - records the compare side and diffs it, and skips notifying when nothing changed;
+  - summarizes, then writes the manifest and copies in the viewer;
+  - publishes to `runs/<owner>/<repo>/pr-<n>/<runId>/`;
+  - notifies Slack and the PR, and writes `$GITHUB_STEP_SUMMARY` with model usage and cost.
+- Storage in core: `local` (default `.reeldiff/published`, optional `publicUrl`) and `s3` (any S3-compatible store, credentials from the AWS SDK env chain, long cache headers except on `index.html` and `manifest.json`).
+- Slack (core): incoming webhook with Block Kit. It has a header, summary, poster (only when publicly reachable over https), Watch demo and Open PR buttons, and a footer, all within Slack's limits. Errors never include the webhook URL.
+- PR comment (CLI, Octokit): finds and updates the `<!-- reeldiff -->` comment, links each flow to `?flow=<id>` in the replay page, and includes healed flows as suggested YAML. PR context comes from the GitHub event, including `deployment_status` (the PR is looked up from the deployed commit), or from flags.
+- Determinism fixes found by running identical UIs through `run`: targets now scroll into view the same way in every mode, and captures wait for running animations to finish.
+- Checked locally against a real UI change, with a base worktree and a fake Slack webhook: the right flow was picked, marked changed, summarized, published and posted.
+
+## Next: M8
+
+The GitHub Action, docs and the README demo.
