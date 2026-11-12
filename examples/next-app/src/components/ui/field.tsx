@@ -7,14 +7,9 @@ export const controlClass = cn(
   "focus-visible:shadow-[var(--shadow-raised),var(--shadow-focus)]",
 );
 
-type FieldProps = { label: string; hint?: string; className?: string };
+type FieldProps = { label: string; className?: string };
 
-export function TextField({
-  label,
-  hint,
-  className,
-  ...props
-}: FieldProps & ComponentProps<"input">) {
+export function TextField({ label, className, ...props }: FieldProps & ComponentProps<"input">) {
   const id = useId();
   return (
     <div className={cn("grid gap-1.5", className)}>
@@ -22,7 +17,6 @@ export function TextField({
         {label}
       </label>
       <input id={id} className={cn(controlClass, "h-9")} {...props} />
-      {hint && <p className="text-xs">{hint}</p>}
     </div>
   );
 }
