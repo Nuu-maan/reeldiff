@@ -28,6 +28,26 @@ export const modelConfigSchema = z.strictObject({
 });
 
 export type ModelConfig = z.infer<typeof modelConfigSchema>;
+
+export const storageConfigSchema = z.discriminatedUnion("type", [
+  z.strictObject({
+    type: z.literal("local"),
+    dir: z.string().min(1).default(".reeldiff/published"),
+    publicUrl: url.optional().meta({ description: "Where dir is served, if anywhere" }),
+  }),
+  z.strictObject({
+    type: z.literal("s3"),
+    bucket: z.string().min(1),
+    endpoint: url.optional().meta({ description: "For R2, MinIO and other S3-compatible stores" }),
+    region: z.string().min(1).default("auto"),
+    publicUrl: url.meta({
+      description: "Public base URL of the bucket, used in Slack and PR links",
+    }),
+    prefix: z.string().default(""),
+  }),
+]);
+
+export type StorageConfig = z.infer<typeof storageConfigSchema>;
 export type ModelTask = "explore" | "heal" | "summarize";
 
 export const authProfileSchema = z.union([
@@ -46,8 +66,17 @@ export const configSchema = z.strictObject({
   auth: z.record(z.string(), authProfileSchema).default({}),
   framework: z.enum(["nextjs-app", "nextjs-pages", "none"]).default("none"),
   uiPaths: z.array(z.string().min(1)).default([]),
-  storage: z.looseObject({ type: z.enum(["s3", "local"]) }).optional(),
-  notify: z.looseObject({}).optional(),
+  storage: storageConfigSchema.default({ type: "local", dir: ".reeldiff/published" }),
+  notify: z
+    .strictObject({
+      slack: z
+        .strictObject({
+          webhookUrl: url.optional().meta({ description: "Incoming webhook URL, read from env" }),
+        })
+        .optional(),
+      githubComment: z.boolean().default(true),
+    })
+    .default({ githubComment: true }),
   diffThreshold: z.number().min(0).max(1).default(0.01).meta({
     description:
       "Fraction of pixels that must differ in the most-changed 64×64 area for a step to count as changed",

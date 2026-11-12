@@ -36,6 +36,23 @@ type OverlayPage = {
 const overlay = (page: Page, call: "show" | "hide") =>
   page.evaluate((method) => (window as unknown as OverlayPage).__reeldiff[method](), call);
 
+// Head and before captures run at different speeds, so wait out finite animations before every screenshot.
+const settle = (page: Page) =>
+  page
+    .waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .every(
+            (a) =>
+              a.playState !== "running" ||
+              a.effect?.getTiming().iterations === Number.POSITIVE_INFINITY,
+          ),
+      undefined,
+      { timeout: 2_000 },
+    )
+    .catch(() => {});
+
 export const maskSelector = (mask: string[] = []) => ["input[type=password]", ...mask].join(", ");
 
 export async function record(flow: Flow, options: RecordOptions): Promise<ManifestFlow> {
@@ -66,6 +83,7 @@ export async function record(flow: Flow, options: RecordOptions): Promise<Manife
 
     const capture = async (name: string): Promise<Capture> => {
       await overlay(page, "hide");
+      await settle(page);
       const screenshot = `${flowPath}/steps/${name}${options.before ? ".before" : ""}.png`;
       await page.screenshot({ path: join(options.runDir, screenshot), animations: "disabled" });
       if (options.before) return { screenshot };

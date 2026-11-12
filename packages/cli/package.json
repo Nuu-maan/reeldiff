@@ -18,6 +18,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@octokit/rest": "22.0.1",
     "@reeldiff/adapters": "workspace:*",
     "@reeldiff/core": "workspace:*",
     "commander": "15.1.0"

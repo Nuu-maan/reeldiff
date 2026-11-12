@@ -15,9 +15,10 @@ next-env.d.ts
 *.log
 .vercel
 
-.reeldiff/out/
-.reeldiff/auth/
+**/.reeldiff/out/
+**/.reeldiff/auth/
 
 .agents/
 .claude/
 .playwright-mcp/
+**/.reeldiff/published/
