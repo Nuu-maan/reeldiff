@@ -1,13 +1,15 @@
 import { access } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import {
   type Config,
   type Flow,
   flowsDir,
   loadConfig,
   loadFlow,
+  loadNearestEnv,
   ReeldiffError,
   type StepResult,
+  type UsageMeter,
 } from "@reeldiff/core";
 
 export type TargetFlags = { headed?: boolean; url?: string; config?: string };
@@ -47,8 +49,13 @@ export async function storageStateFor(flow: Flow, config: Config, rootDir: strin
   return path;
 }
 
+export async function loadProject(flags: { config?: string }) {
+  loadNearestEnv(flags.config ? dirname(resolve(flags.config)) : process.cwd());
+  return loadConfig({ path: flags.config });
+}
+
 export async function prepare(flowId: string, flags: TargetFlags) {
-  const loaded = await loadConfig({ path: flags.config });
+  const loaded = await loadProject(flags);
   const baseUrl = parseBaseUrl(flags.url ?? loaded.config.baseUrl);
   const flow = await loadFlow(flowsDir(loaded.rootDir), flowId);
   const storageState = await storageStateFor(flow, loaded.config, loaded.rootDir);
@@ -80,3 +87,12 @@ export const firstFailure = (steps: StepResult[]): Failure | undefined => {
     intent: "intent" in failed.step ? failed.step.intent : undefined,
   };
 };
+
+export function printUsage(meter: UsageMeter) {
+  const { calls, inputTokens, outputTokens, costUsd } = meter.total;
+  if (!calls) return;
+  const cost = costUsd === undefined ? "" : `, $${costUsd.toFixed(4)}`;
+  console.log(
+    `Model usage: ${calls} calls, ${inputTokens.toLocaleString("en")} in / ${outputTokens.toLocaleString("en")} out tokens${cost}`,
+  );
+}
