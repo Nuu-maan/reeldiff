@@ -1,0 +1,33 @@
+{
+  "name": "@reeldiff/cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The reeldiff command line",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "reeldiff": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@reeldiff/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@reeldiff/typescript-config": "workspace:*",
+    "@types/node": "26.6.6",
+    "tsdown": "0.23.7",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

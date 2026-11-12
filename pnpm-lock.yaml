@@ -207,6 +207,28 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  packages/cli:
+    dependencies:
+      '@reeldiff/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@reeldiff/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: 26.6.6
+        version: 26.6.6
+      tsdown:
+        specifier: 0.23.7
+        version: 0.23.7(typescript@6.0.3)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@26.6.6)(vite@8.3.8(@types/node@26.6.6)(jiti@2.7.0))
+
   packages/core:
     devDependencies:
       '@reeldiff/typescript-config':
