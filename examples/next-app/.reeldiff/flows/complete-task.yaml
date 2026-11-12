@@ -4,6 +4,7 @@ title: Add and complete a task
 description: Someone opens a project, adds a task and checks it off.
 start: /dashboard
 covers:
+  - "src/components/**"
   - "src/features/projects/**"
   - "src/app/(app)/projects/**"
 steps:

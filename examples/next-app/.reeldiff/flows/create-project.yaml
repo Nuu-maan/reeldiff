@@ -4,6 +4,7 @@ title: Create a new project
 description: Someone starts a project from a template on the dashboard.
 start: /dashboard
 covers:
+  - "src/components/**"
   - "src/features/projects/new-project-dialog.tsx"
   - "src/features/projects/project-grid.tsx"
   - "src/app/(app)/dashboard/**"
