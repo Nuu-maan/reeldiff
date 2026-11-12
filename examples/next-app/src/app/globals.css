@@ -21,6 +21,12 @@
 
 html {
   scrollbar-gutter: stable;
+  background: var(--color-page);
+  transition: background-color 200ms var(--ease-out);
+}
+
+html:has(.backdrop[data-open]:not([data-ending-style])) {
+  background: color-mix(in srgb, var(--color-page) 80%, black);
 }
 
 body {

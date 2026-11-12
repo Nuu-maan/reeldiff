@@ -34,11 +34,11 @@ export function NewProjectDialog() {
         New project
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/20 transition-opacity duration-200 ease-out data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-        <Dialog.Viewport className="fixed inset-0 grid place-items-center p-4">
+        <Dialog.Backdrop className="backdrop fixed inset-0 bg-black/20 transition-opacity duration-200 ease-out data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
+        <Dialog.Viewport className="fixed inset-0 flex overflow-y-auto p-4">
           <Dialog.Popup
             className={cn(
-              "w-full max-w-md rounded-3xl bg-white p-6 shadow-popover outline-none",
+              "m-auto w-full max-w-md rounded-3xl bg-white p-6 shadow-popover outline-none",
               "transition-[opacity,scale] duration-200 ease-out data-[ending-style]:duration-100",
               "data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
             )}
