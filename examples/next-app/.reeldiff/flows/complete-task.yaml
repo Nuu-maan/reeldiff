@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=../../../../packages/core/schema/flow.schema.json
+id: complete-task
+title: Add and complete a task
+description: Someone opens a project, adds a task and checks it off.
+start: /dashboard
+covers:
+  - "src/features/projects/**"
+  - "src/app/(app)/projects/**"
+steps:
+  - action: click
+    target: { role: link, name: "Mobile onboarding" }
+    intent: Open the Mobile onboarding project
+  - action: click
+    target: { role: tab, name: "Tasks" }
+    intent: Switch to the tasks tab
+  - action: fill
+    target: { label: "New task" }
+    value: "Write release notes"
+    intent: Type a new task
+  - action: click
+    target: { role: button, name: "Add task" }
+    intent: Add the task
+    caption: New tasks join the list
+  - action: click
+    target: { role: checkbox, name: "Write release notes" }
+    intent: Check off the new task
+  - action: click
+    target: { role: tab, name: "Overview" }
+    intent: Go back to the overview
+  - action: expect
+    target: { text: "2 of 4 done" }
+    intent: Progress counts the finished task
+    caption: Progress updates right away

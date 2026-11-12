@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=../../../../packages/core/schema/flow.schema.json
+id: upgrade-plan
+title: Upgrade to the Team plan
+description: Someone upgrades their plan and saves billing details.
+start: /settings/billing
+covers:
+  - "src/features/billing/**"
+  - "src/app/(app)/settings/billing/**"
+steps:
+  - action: click
+    target: { role: button, name: "Upgrade to Team" }
+    intent: Upgrade to the Team plan
+    caption: One press to upgrade
+  - action: expect
+    target: { text: "You're on Team." }
+    intent: The current plan reads Team
+  - action: fill
+    target: { label: "Billing email" }
+    value: "billing@example.com"
+    intent: Enter the billing email
+  - action: fill
+    target: { label: "Card number" }
+    value: "4242 4242 4242 4242"
+    intent: Enter a test card number
+  - action: select
+    target: { label: "Country" }
+    value: "Germany"
+    intent: Pick the billing country
+  - action: click
+    target: { role: button, name: "Save billing details" }
+    intent: Save the billing details
+  - action: expect
+    target: { text: "Saved" }
+    intent: The form confirms the save
