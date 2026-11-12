@@ -73,6 +73,8 @@ export function App() {
 function Run({ manifest }: { manifest: Manifest }) {
   const flows = [...manifest.flows].sort((a, b) => order[a.status] - order[b.status]);
   const headline = manifest.summary?.headline ?? manifest.pr?.title ?? "UI changes";
+  const requested = new URLSearchParams(location.search).get("flow");
+  const initial = flows.find((flow) => flow.id === requested)?.id ?? flows[0]?.id;
 
   return (
     <>
@@ -101,7 +103,7 @@ function Run({ manifest }: { manifest: Manifest }) {
       {flows.length === 0 ? (
         <p className="rounded-2xl bg-surface p-6 text-sm">No flows were affected in this run.</p>
       ) : (
-        <Tabs.Root defaultValue={flows[0]?.id} className="grid gap-6">
+        <Tabs.Root defaultValue={initial} className="grid gap-6">
           <Tabs.List
             className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 max-sm:[mask-image:linear-gradient(to_right,#000_calc(100%-3rem),transparent)] sm:mx-0 sm:px-0"
             aria-label="Flows"
