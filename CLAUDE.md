@@ -12,7 +12,7 @@ Records demos of UI changes on every PR and posts them to Slack and the PR. Spec
 ## Layout
 
 - `packages/core`: deterministic engine. No CLI, GitHub or Slack code here.
-- `packages/cli`: the `reeldiff` bin, thin over core.
+- `packages/cli`: published as `reeldiff`. The bin, plus `defineConfig` re-exported for config files. Thin over core.
 - `examples/next-app`: "Plot", the demo app flows run against. Next.js 16 App Router, `src/` with `app/` for routes only, `features/<name>/` for feature code, `components/ui` for primitives, `lib/` for shared helpers.
 - Later milestones add `packages/viewer`, `packages/action`, `packages/adapters`.
 

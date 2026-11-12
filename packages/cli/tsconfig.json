@@ -1,8 +1,4 @@
 {
   "extends": "@reeldiff/typescript-config/base.json",
-  "compilerOptions": {
-    "isolatedDeclarations": true,
-    "declaration": true
-  },
   "include": ["src"]
 }

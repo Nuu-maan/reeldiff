@@ -1,8 +1,8 @@
 {
-  "name": "@reeldiff/cli",
+  "name": "reeldiff",
   "version": "0.0.0",
   "private": true,
-  "description": "The reeldiff command line",
+  "description": "Every PR gets a demo of what changed",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -18,7 +18,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@reeldiff/core": "workspace:*"
+    "@reeldiff/core": "workspace:*",
+    "commander": "15.1.0"
   },
   "devDependencies": {
     "@reeldiff/typescript-config": "workspace:*",
@@ -29,5 +30,9 @@
   },
   "engines": {
     "node": ">=22.18.0"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
   }
 }

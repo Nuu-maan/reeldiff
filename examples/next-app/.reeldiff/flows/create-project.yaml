@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=../../../../packages/core/schema/flow.schema.json
+id: create-project
+title: Create a new project
+description: Someone starts a project from a template on the dashboard.
+start: /dashboard
+covers:
+  - "src/features/projects/new-project-dialog.tsx"
+  - "src/features/projects/project-grid.tsx"
+  - "src/app/(app)/dashboard/**"
+steps:
+  - action: click
+    target: { role: button, name: "New project" }
+    intent: Open the new project dialog
+    caption: Start a new project from the dashboard
+  - action: fill
+    target: { label: "Project name" }
+    value: "Acme launch"
+    intent: Type a name into the project name field
+  - action: select
+    target: { label: "Template" }
+    value: "Product launch"
+    intent: Pick the product launch template
+    caption: Templates come with a few starter tasks
+  - action: click
+    target: { role: button, name: "Create" }
+    intent: Submit the form
+  - action: expect
+    target: { role: heading, name: "Acme launch" }
+    intent: The new project appears on the dashboard
+  - action: expect
+    target: { text: "4 projects" }
+    intent: The project count goes up
