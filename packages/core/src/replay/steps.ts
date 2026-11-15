@@ -14,10 +14,18 @@ export type StepResult = {
 
 export type StepContext = { page: Page; step: Step; index: number; target?: Locator };
 
+export type Point = { x: number; y: number };
+export type PointerTrack = {
+  moves: { start: number; end: number; from: Point; to: Point }[];
+  presses: number[];
+};
+
 export type RunOptions = {
   stepDelay: number;
   stepTimeout: number;
   humanize?: boolean;
+  /** When set, the pointer glides in real time and each move and press is logged so the video can draw the cursor. */
+  pointer?: PointerTrack;
   beforeStep?: (context: StepContext) => Promise<void>;
   onStep?: (result: StepResult) => void;
 };
@@ -42,23 +50,25 @@ export function describeStep(step: Step): string {
   }
 }
 
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+const glideMs = (from: Point, to: Point) =>
+  Math.min(700, Math.max(300, 250 + Math.hypot(to.x - from.x, to.y - from.y) * 0.4));
 
-async function glideTo(page: Page, target: Locator, timeout: number, frames = 24) {
+async function pointTo(page: Page, target: Locator, timeout: number, track?: PointerTrack) {
   await target.scrollIntoViewIfNeeded({ timeout });
   const box = await target.boundingBox({ timeout });
   if (!box) return;
   const to = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-  const from = await page.evaluate(
-    () => (window as unknown as { __reeldiffPointer?: { x: number; y: number } }).__reeldiffPointer,
-  );
-  const start = from ?? { x: to.x, y: to.y - 120 };
-  for (let frame = 1; frame <= frames; frame++) {
-    const t = easeInOut(frame / frames);
-    await page.mouse.move(start.x + (to.x - start.x) * t, start.y + (to.y - start.y) * t);
-    await page.waitForTimeout(16);
+  if (track) {
+    const from = track.moves.at(-1)?.to ?? { x: to.x, y: to.y - 120 };
+    const start = Date.now();
+    const ms = glideMs(from, to);
+    track.moves.push({ start, end: start + ms, from, to });
+    await page.waitForTimeout(ms);
   }
+  await page.mouse.move(to.x, to.y);
 }
+
+const press = (track: PointerTrack | undefined) => track?.presses.push(Date.now());
 
 const pointerActions = new Set(["click", "fill", "select", "hover"]);
 
@@ -68,12 +78,13 @@ async function perform(context: StepContext, options: RunOptions) {
   // Scroll and park the pointer the same way in every mode, or before/after screenshots differ in scroll offset and :hover state.
   if (target && pointerActions.has(step.action)) {
     await target.scrollIntoViewIfNeeded({ timeout });
-    await glideTo(page, target, timeout, options.humanize ? 24 : 1);
+    await pointTo(page, target, timeout, options.pointer);
   }
   switch (step.action) {
     case "goto":
       return void (await page.goto(step.url, { timeout }));
     case "click":
+      press(options.pointer);
       return target?.click({ timeout });
     case "fill":
       if (!options.humanize) return target?.fill(step.value, { timeout });
@@ -83,13 +94,15 @@ async function perform(context: StepContext, options: RunOptions) {
       if (!target) return;
       const native = await target.evaluate((el) => el.tagName === "SELECT", undefined, { timeout });
       if (native) return void (await target.selectOption(step.value, { timeout }));
+      press(options.pointer);
       await target.click({ timeout });
       const option = page.getByRole("option", { name: step.value, exact: true });
       await option.scrollIntoViewIfNeeded({ timeout });
       if (options.humanize) {
         await page.waitForTimeout(250);
       }
-      await glideTo(page, option, timeout, options.humanize ? 24 : 1);
+      await pointTo(page, option, timeout, options.pointer);
+      press(options.pointer);
       return option.click({ timeout });
     }
     case "press":
