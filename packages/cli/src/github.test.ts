@@ -71,6 +71,16 @@ describe("commentMarkdown", () => {
   });
 });
 
+test("escapes flow titles in links, table cells and image alt text", () => {
+  const title = 'Pay [beta] | "fast" <now>';
+  const body = commentMarkdown({
+    ...report,
+    manifest: { ...manifest, flows: [{ ...manifest.flows[0], title } as Manifest["flows"][0]] },
+  });
+  expect(body).toContain('[Pay \\[beta\\] \\| "fast" <now>](');
+  expect(body).toContain('alt="Pay [beta] | &quot;fast&quot; &lt;now>"');
+});
+
 describe("githubContext", () => {
   afterEach(() => {
     delete process.env.GITHUB_EVENT_PATH;

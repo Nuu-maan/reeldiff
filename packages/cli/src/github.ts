@@ -34,6 +34,11 @@ type Event = {
 
 const marker = "<!-- reeldiff -->";
 
+const cell = (text: string) => text.replaceAll("|", "\\|").replaceAll("\n", " ");
+const linkText = (text: string) => cell(text).replace(/[[\]]/g, "\\$&");
+const attr = (text: string) =>
+  text.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+
 async function readEvent(): Promise<Event | undefined> {
   const path = process.env.GITHUB_EVENT_PATH;
   if (!path) return undefined;
@@ -109,13 +114,11 @@ export function commentMarkdown(report: RunReport, usageLine?: string): string {
   lines.push("| Flow | Status | Note |", "| --- | --- | --- |");
   for (const flow of manifest.flows) {
     const link = report.runUrl
-      ? `[${flow.title}](${report.runUrl}?flow=${encodeURIComponent(flow.id)})`
-      : flow.title;
+      ? `[${linkText(flow.title)}](${report.runUrl}?flow=${encodeURIComponent(flow.id)})`
+      : cell(flow.title);
     const note =
       (flow.status === "broken" ? flow.reason : manifest.summary?.perFlow[flow.id]) ?? "";
-    lines.push(
-      `| ${link} | ${flow.status} | ${note.replaceAll("|", "\\|").replaceAll("\n", " ")} |`,
-    );
+    lines.push(`| ${link} | ${flow.status} | ${cell(note)} |`);
   }
   lines.push("");
 
@@ -125,7 +128,7 @@ export function commentMarkdown(report: RunReport, usageLine?: string): string {
     .filter((entry) => entry.url?.startsWith("https://"))
     .slice(0, 4);
   for (const { flow, url } of posters)
-    lines.push(`<img src="${url}" alt="${flow.title}" width="360">`);
+    lines.push(`<img src="${attr(url ?? "")}" alt="${attr(flow.title)}" width="360">`);
   if (posters.length) lines.push("");
 
   for (const flow of manifest.flows.filter((f) => f.healed)) {
