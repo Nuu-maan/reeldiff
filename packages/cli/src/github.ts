@@ -16,7 +16,7 @@ export type PullRequest = {
   sha?: string;
   baseSha?: string;
 };
-export type RunContext = { repo?: string; pr?: PullRequest; token?: string };
+export type RunContext = { repo?: string; pr?: PullRequest; token?: string; fork?: boolean };
 
 type ContextFlags = { repo?: string; pr?: string; title?: string };
 
@@ -26,8 +26,8 @@ type Event = {
     title: string;
     body?: string | null;
     html_url: string;
-    head: { sha: string };
-    base: { sha: string };
+    head: { sha: string; repo?: { full_name: string } | null };
+    base: { sha: string; repo?: { full_name: string } };
   };
   deployment?: { sha: string };
 };
@@ -56,6 +56,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
   const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
   const event = await readEvent();
   let pr: PullRequest | undefined;
+  let fork = false;
 
   if (event?.pull_request) {
     const p = event.pull_request;
@@ -67,6 +68,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
       sha: p.head.sha,
       baseSha: p.base.sha,
     };
+    fork = Boolean(p.base.repo) && p.head.repo?.full_name !== p.base.repo?.full_name;
   } else if (event?.deployment && repo && token) {
     const octokit = new Octokit({ auth: token });
     const { data } = await octokit.repos.listPullRequestsAssociatedWithCommit({
@@ -99,7 +101,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
   } else if (flags.title && pr) {
     pr = { ...pr, title: flags.title };
   }
-  return { repo, pr, token };
+  return { repo, pr, token, fork };
 }
 
 export function commentMarkdown(report: RunReport, usageLine?: string): string {

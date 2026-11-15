@@ -253,7 +253,9 @@ export async function runCommand(flags: RunFlags) {
   const webhook = config.notify.slack?.webhookUrl;
   if (webhook) notifiers.push(slackNotifier(webhook));
   else console.log("Slack: skipped, no webhook URL configured.");
-  if (config.notify.githubComment && context.token && context.repo && context.pr) {
+  if (config.notify.githubComment && context.fork) {
+    console.log("PR comment: skipped, the token on a fork PR can't write comments.");
+  } else if (config.notify.githubComment && context.token && context.repo && context.pr) {
     notifiers.push(
       githubCommentNotifier({
         token: context.token,
