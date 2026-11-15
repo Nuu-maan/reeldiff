@@ -18,8 +18,11 @@ export async function changedFiles(cwd: string, base: string, head: string): Pro
       .filter(Boolean);
   } catch (error) {
     const stderr = (error as { stderr?: string }).stderr?.trim();
+    const hint = /no merge base|unknown revision|bad revision/.test(stderr ?? "")
+      ? "\nFetch the full history (actions/checkout with fetch-depth: 0) and check that both refs exist, or pass --base and --head."
+      : "";
     throw new ReeldiffError(
-      `git diff ${base}...${head} failed: ${stderr || (error as Error).message}`,
+      `git diff ${base}...${head} failed: ${stderr || (error as Error).message}${hint}`,
     );
   }
 }
