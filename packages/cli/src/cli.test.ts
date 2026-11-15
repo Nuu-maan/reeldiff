@@ -4,7 +4,10 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { version } from "@reeldiff/core";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+
+// Each test spawns the CLI, which loads all of core (about 2s alone, far more on a busy runner).
+vi.setConfig({ testTimeout: 60_000 });
 
 const cli = resolve("dist/cli.mjs");
 const run = (args: string[], cwd?: string) => {
