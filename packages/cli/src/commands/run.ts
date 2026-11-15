@@ -54,8 +54,19 @@ type RunFlags = {
   model?: string;
 };
 
-const routeFlow = (route: string): Flow => ({
-  id: `route-${slugify(route) === "flow" ? "home" : slugify(route)}`,
+export const routeFlows = (routes: string[]): Flow[] => {
+  const taken = new Set<string>();
+  return routes.map((route) => {
+    const base = `route-${slugify(route) === "flow" ? "home" : slugify(route)}`;
+    let id = base;
+    for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
+    taken.add(id);
+    return routeFlow(route, id);
+  });
+};
+
+const routeFlow = (route: string, id: string): Flow => ({
+  id,
   title: route,
   start: route,
   auth: "none",
@@ -170,7 +181,8 @@ export async function runCommand(flags: RunFlags) {
     }
     recorded.push(result);
   }
-  for (const { route } of affected.routes) recorded.push(await capture(routeFlow(route), "route"));
+  for (const flow of routeFlows(affected.routes.map((entry) => entry.route)))
+    recorded.push(await capture(flow, "route"));
 
   const decision = shouldNotify({ flows: recorded });
   const summaryModel = modelFor("summarize");
