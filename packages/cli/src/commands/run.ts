@@ -148,6 +148,7 @@ export async function runCommand(flags: RunFlags) {
       console.log(`  ${flow.id}: trying to heal`);
       const healing = await heal(flow, {
         baseUrl: baseUrl.href,
+        storageState: await storageStateFor(flow, config, rootDir),
         model: healModel,
         meter,
         stepDelay: config.stepDelay,

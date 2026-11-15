@@ -1,8 +1,11 @@
+import { mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { ClientLLM } from "@browserbasehq/stagehand";
 import { MockLanguageModelV4 } from "ai/test";
 import { expect, test } from "vitest";
 import { UsageMeter } from "./model.ts";
-import { stagehandModel } from "./stagehand.ts";
+import { openAiSession, stagehandModel } from "./stagehand.ts";
 
 type Request = Parameters<ClientLLM["generate"]>[0];
 
@@ -63,3 +66,30 @@ test("answers plain requests as text", async () => {
   } as unknown as Request)) as Record<string, unknown>;
   expect(result).toMatchObject({ outputFormat: "text", content: { type: "text", text: "done" } });
 });
+
+test("an AI session starts with the auth profile's storage state", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "reeldiff-state-"));
+  const state = join(dir, "state.json");
+  const cookie = { name: "sid", value: "abc", domain: "example.test", path: "/" };
+  await writeFile(
+    state,
+    JSON.stringify({
+      cookies: [{ ...cookie, expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }],
+      origins: [],
+    }),
+  );
+  const session = await openAiSession({
+    flow: { viewport: { width: 800, height: 600 } },
+    storageState: state,
+    model: reply("{}"),
+    meter: new UsageMeter(),
+    task: "heal",
+  });
+  try {
+    expect(await session.page.context().cookies("http://example.test")).toEqual([
+      expect.objectContaining(cookie),
+    ]);
+  } finally {
+    await session.close();
+  }
+}, 60_000);

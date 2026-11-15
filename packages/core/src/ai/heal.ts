@@ -20,6 +20,7 @@ export type HealOptions = {
   model: LanguageModel;
   meter: UsageMeter;
   headed?: boolean;
+  storageState?: string;
   stepDelay?: number;
   stepTimeout?: number;
   onStep?: (result: StepResult) => void;
@@ -35,6 +36,7 @@ export async function heal(flow: Flow, options: HealOptions): Promise<HealResult
   const session = await openAiSession({
     flow,
     headed: options.headed,
+    storageState: options.storageState,
     model: options.model,
     meter: options.meter,
     task: "heal",
