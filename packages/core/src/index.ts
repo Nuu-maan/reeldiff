@@ -70,7 +70,7 @@ export {
   shownFlows,
 } from "./notify/notifier.ts";
 export { slackMessage, slackNotifier } from "./notify/slack.ts";
-export { toMp4 } from "./record/ffmpeg.ts";
+export { framesToMp4 } from "./record/ffmpeg.ts";
 export { maskSelector, type RecordOptions, record } from "./record/record.ts";
 export { createRunDir, newRunId, writeManifest } from "./record/run-dir.ts";
 export { describeTarget, locate } from "./replay/locate.ts";
