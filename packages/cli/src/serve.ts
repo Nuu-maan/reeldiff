@@ -18,7 +18,13 @@ const types: Record<string, string> = {
 export function serveDir(root: string, port: number): Promise<Server> {
   const base = resolve(root);
   const server = createServer(async (req, res) => {
-    const pathname = decodeURIComponent(new URL(req.url ?? "/", "http://x").pathname);
+    let pathname: string;
+    try {
+      pathname = decodeURIComponent(new URL(req.url ?? "/", "http://x").pathname);
+    } catch {
+      res.writeHead(400).end("Bad request");
+      return;
+    }
     const file = normalize(join(base, pathname.endsWith("/") ? `${pathname}index.html` : pathname));
     if (file !== base && !file.startsWith(base + sep)) {
       res.writeHead(403).end();

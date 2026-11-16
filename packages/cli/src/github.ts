@@ -16,7 +16,7 @@ export type PullRequest = {
   sha?: string;
   baseSha?: string;
 };
-export type RunContext = { repo?: string; pr?: PullRequest; token?: string };
+export type RunContext = { repo?: string; pr?: PullRequest; token?: string; fork?: boolean };
 
 type ContextFlags = { repo?: string; pr?: string; title?: string };
 
@@ -26,13 +26,18 @@ type Event = {
     title: string;
     body?: string | null;
     html_url: string;
-    head: { sha: string };
-    base: { sha: string };
+    head: { sha: string; repo?: { full_name: string } | null };
+    base: { sha: string; repo?: { full_name: string } };
   };
   deployment?: { sha: string };
 };
 
 const marker = "<!-- reeldiff -->";
+
+const cell = (text: string) => text.replaceAll("|", "\\|").replaceAll("\n", " ");
+const linkText = (text: string) => cell(text).replace(/[[\]]/g, "\\$&");
+const attr = (text: string) =>
+  text.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
 
 async function readEvent(): Promise<Event | undefined> {
   const path = process.env.GITHUB_EVENT_PATH;
@@ -51,6 +56,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
   const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
   const event = await readEvent();
   let pr: PullRequest | undefined;
+  let fork = false;
 
   if (event?.pull_request) {
     const p = event.pull_request;
@@ -62,6 +68,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
       sha: p.head.sha,
       baseSha: p.base.sha,
     };
+    fork = Boolean(p.base.repo) && p.head.repo?.full_name !== p.base.repo?.full_name;
   } else if (event?.deployment && repo && token) {
     const octokit = new Octokit({ auth: token });
     const { data } = await octokit.repos.listPullRequestsAssociatedWithCommit({
@@ -94,7 +101,7 @@ export async function githubContext(flags: ContextFlags): Promise<RunContext> {
   } else if (flags.title && pr) {
     pr = { ...pr, title: flags.title };
   }
-  return { repo, pr, token };
+  return { repo, pr, token, fork };
 }
 
 export function commentMarkdown(report: RunReport, usageLine?: string): string {
@@ -109,13 +116,11 @@ export function commentMarkdown(report: RunReport, usageLine?: string): string {
   lines.push("| Flow | Status | Note |", "| --- | --- | --- |");
   for (const flow of manifest.flows) {
     const link = report.runUrl
-      ? `[${flow.title}](${report.runUrl}?flow=${encodeURIComponent(flow.id)})`
-      : flow.title;
+      ? `[${linkText(flow.title)}](${report.runUrl}?flow=${encodeURIComponent(flow.id)})`
+      : cell(flow.title);
     const note =
       (flow.status === "broken" ? flow.reason : manifest.summary?.perFlow[flow.id]) ?? "";
-    lines.push(
-      `| ${link} | ${flow.status} | ${note.replaceAll("|", "\\|").replaceAll("\n", " ")} |`,
-    );
+    lines.push(`| ${link} | ${flow.status} | ${cell(note)} |`);
   }
   lines.push("");
 
@@ -125,7 +130,7 @@ export function commentMarkdown(report: RunReport, usageLine?: string): string {
     .filter((entry) => entry.url?.startsWith("https://"))
     .slice(0, 4);
   for (const { flow, url } of posters)
-    lines.push(`<img src="${url}" alt="${flow.title}" width="360">`);
+    lines.push(`<img src="${attr(url ?? "")}" alt="${attr(flow.title)}" width="360">`);
   if (posters.length) lines.push("");
 
   for (const flow of manifest.flows.filter((f) => f.healed)) {

@@ -44,7 +44,7 @@ export function describeStep(step: Step): string {
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
-async function glideTo(page: Page, target: Locator, timeout: number) {
+async function glideTo(page: Page, target: Locator, timeout: number, frames = 24) {
   await target.scrollIntoViewIfNeeded({ timeout });
   const box = await target.boundingBox({ timeout });
   if (!box) return;
@@ -53,7 +53,6 @@ async function glideTo(page: Page, target: Locator, timeout: number) {
     () => (window as unknown as { __reeldiffPointer?: { x: number; y: number } }).__reeldiffPointer,
   );
   const start = from ?? { x: to.x, y: to.y - 120 };
-  const frames = 24;
   for (let frame = 1; frame <= frames; frame++) {
     const t = easeInOut(frame / frames);
     await page.mouse.move(start.x + (to.x - start.x) * t, start.y + (to.y - start.y) * t);
@@ -66,10 +65,10 @@ const pointerActions = new Set(["click", "fill", "select", "hover"]);
 async function perform(context: StepContext, options: RunOptions) {
   const { page, step, target } = context;
   const timeout = options.stepTimeout;
-  // Scroll the same way in every mode, or before/after screenshots end up at different offsets.
+  // Scroll and park the pointer the same way in every mode, or before/after screenshots differ in scroll offset and :hover state.
   if (target && pointerActions.has(step.action)) {
     await target.scrollIntoViewIfNeeded({ timeout });
-    if (options.humanize) await glideTo(page, target, timeout);
+    await glideTo(page, target, timeout, options.humanize ? 24 : 1);
   }
   switch (step.action) {
     case "goto":
@@ -89,8 +88,8 @@ async function perform(context: StepContext, options: RunOptions) {
       await option.scrollIntoViewIfNeeded({ timeout });
       if (options.humanize) {
         await page.waitForTimeout(250);
-        await glideTo(page, option, timeout);
       }
+      await glideTo(page, option, timeout, options.humanize ? 24 : 1);
       return option.click({ timeout });
     }
     case "press":

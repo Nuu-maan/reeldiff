@@ -94,6 +94,7 @@ export type AiSession = {
 export async function openAiSession(options: {
   flow: Pick<Flow, "viewport">;
   headed?: boolean;
+  storageState?: string;
   model: LanguageModel;
   meter: UsageMeter;
   task: ModelTask;
@@ -112,6 +113,7 @@ export async function openAiSession(options: {
     if (!browser.cdpUrl) throw new ReeldiffError("The AI browser did not expose a CDP endpoint.");
     const playwright = await chromium.connectOverCDP(browser.cdpUrl);
     const context = playwright.contexts()[0] ?? (await playwright.newContext());
+    if (options.storageState) await context.setStorageState(options.storageState);
     const page = context.pages()[0] ?? (await context.newPage());
     await page.setViewportSize(options.flow.viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });

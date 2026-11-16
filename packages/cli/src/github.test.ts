@@ -71,6 +71,16 @@ describe("commentMarkdown", () => {
   });
 });
 
+test("escapes flow titles in links, table cells and image alt text", () => {
+  const title = 'Pay [beta] | "fast" <now>';
+  const body = commentMarkdown({
+    ...report,
+    manifest: { ...manifest, flows: [{ ...manifest.flows[0], title } as Manifest["flows"][0]] },
+  });
+  expect(body).toContain('[Pay \\[beta\\] \\| "fast" <now>](');
+  expect(body).toContain('alt="Pay [beta] | &quot;fast&quot; &lt;now>"');
+});
+
 describe("githubContext", () => {
   afterEach(() => {
     delete process.env.GITHUB_EVENT_PATH;
@@ -105,6 +115,25 @@ describe("githubContext", () => {
         baseSha: "def456",
       },
     });
+  });
+
+  test("flags fork PRs, whose token can't comment", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "reeldiff-event-"));
+    const event = join(dir, "event.json");
+    const pr = (head: string) => ({
+      pull_request: {
+        number: 1,
+        title: "t",
+        html_url: "https://github.com/acme/app/pull/1",
+        head: { sha: "a", repo: { full_name: head } },
+        base: { sha: "b", repo: { full_name: "acme/app" } },
+      },
+    });
+    process.env.GITHUB_EVENT_PATH = event;
+    await writeFile(event, JSON.stringify(pr("someone/app")));
+    expect((await githubContext({})).fork).toBe(true);
+    await writeFile(event, JSON.stringify(pr("acme/app")));
+    expect((await githubContext({})).fork).toBe(false);
   });
 
   test("flags override and validate", async () => {

@@ -14,13 +14,18 @@ const page = (label: string) => `<!doctype html><title>x</title>
 <style>body{font:16px sans-serif;margin:40px} button{font-size:24px;padding:12px 24px}</style>
 <button onclick="done.hidden=false">${label}</button><p id="done" hidden>Done</p>`;
 
+const formPage = `<!doctype html><title>x</title>
+<style>input{font-size:24px;margin:40px;border:2px solid #ccc} input:hover{border-color:#e00;outline:6px solid #e00}</style>
+<label>Name <input></label><p>Ready</p>`;
+
 let server: ReturnType<typeof createServer>;
 let base = "";
 
 beforeAll(async () => {
   server = createServer((req, res) => {
     const label = req.url?.startsWith("/v2") ? "Save changes now" : "Save";
-    res.writeHead(200, { "content-type": "text/html" }).end(page(label));
+    const body = req.url?.startsWith("/form") ? formPage : page(label);
+    res.writeHead(200, { "content-type": "text/html" }).end(body);
   });
   await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -60,6 +65,17 @@ describe("compareFlow", () => {
     expect(result.steps[0]?.changed).toBe(true);
     expect(result.steps[0]?.diff).toBeGreaterThan(0.001);
   });
+});
+
+test("hover left by the humanized pointer doesn't count as a change", async () => {
+  const runDir = await mkdtemp(join(tmpdir(), "reeldiff-compare-"));
+  const fill = parseFlow(
+    "id: fill\ntitle: Fill\nstart: /form\nsteps:\n  - { action: fill, target: { label: Name }, value: Ada, intent: Name }\n  - { action: expect, target: { text: Ready }, intent: Ready }\n",
+    "fill.yaml",
+  );
+  const head = await record(fill, { baseUrl: base, runDir, stepDelay: 0 });
+  const before = await record(fill, { baseUrl: base, runDir, stepDelay: 0, before: true });
+  expect((await compareFlow(runDir, head, before, 0.001)).status).toBe("unchanged");
 });
 
 describe("shouldNotify", () => {

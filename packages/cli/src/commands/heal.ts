@@ -19,7 +19,7 @@ import {
 } from "./shared.ts";
 
 export async function healCommand(flowId: string, flags: TargetFlags) {
-  const { config, rootDir, baseUrl, flow } = await prepare(flowId, flags);
+  const { config, rootDir, baseUrl, flow, storageState } = await prepare(flowId, flags);
   const meter = new UsageMeter();
   const model = languageModel(config.model, "heal");
 
@@ -29,6 +29,7 @@ export async function healCommand(flowId: string, flags: TargetFlags) {
     model,
     meter,
     headed: flags.headed,
+    storageState,
     stepDelay: config.stepDelay,
     onStep: printStep,
     onHeal: (change) =>
