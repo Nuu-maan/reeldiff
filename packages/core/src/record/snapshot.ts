@@ -8,7 +8,10 @@ let cached: string | undefined;
 
 export async function rrwebInitScript(): Promise<string> {
   cached ??= await readFile(createRequire(import.meta.url).resolve("rrweb-snapshot"), "utf8");
-  return `(() => { const module = { exports: {} }; const exports = module.exports;\n${cached}\n;window.__rrwebSnapshot = module.exports; })();`;
+  // Snapshot a throwaway document now, before page scripts can patch DOM prototypes. rrweb caches the
+  // native ones, so it never mounts a probe iframe later, which leaves Playwright's networkidle stuck.
+  const warm = `const probe = document.implementation.createHTMLDocument(""); probe.body.attachShadow({ mode: "open" }).append(probe.createElement("i")); module.exports.snapshot(probe, {});`;
+  return `(() => { const module = { exports: {} }; const exports = module.exports;\n${cached}\n;${warm} window.__rrwebSnapshot = module.exports; })();`;
 }
 
 type SnapshotWindow = Window & {
